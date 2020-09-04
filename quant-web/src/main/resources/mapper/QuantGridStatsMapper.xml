@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.slf.quant.dao.QuantGridStatsMapper">
+    <!-- 基础列 -->
+    <sql id="quantGridStatsColumns">
+        a.id as id,
+        a.account_id as accountId,
+        a.exchange as exchange,
+        a.strategy_id as strategyId,
+        a.currency as currency,
+        a.buy_order_id as buyOrderId,
+        a.sell_order_id as sellOrderId,
+        a.buy_cont as buyCont,
+        a.sell_cont as sellCont,
+        a.buy_price as buyPrice,
+        a.sell_price as sellPrice,
+        a.buy_usdt as buyUsdt,
+        a.sell_usdt as sellUsdt,
+        a.buy_time as buyTime,
+        a.sell_time as sellTime,
+        a.order_status as orderStatus,
+        a.first_direct as firstDirect,
+        a.update_time as updateTime
+    </sql>
+
+    <!-- 普通插入 -->
+    <insert id="insert" parameterType="com.slf.quant.facade.entity.strategy.QuantGridStats">
+        insert into quant_grid_stats(
+            id ,
+            account_id ,
+            exchange ,
+            strategy_id ,
+            currency ,
+            buy_order_id ,
+            sell_order_id ,
+            buy_cont ,
+            sell_cont,
+            buy_price,
+            sell_price,
+            buy_usdt,
+            sell_usdt,
+            buy_time,
+            sell_time,
+            order_status,
+            first_direct,
+            update_time
+        ) VALUES (
+            #{id} ,
+            #{accountId} ,
+            #{exchange} ,
+            #{strategyId} ,
+            #{currency} ,
+            #{buyOrderId} ,
+            #{sellOrderId} ,
+            #{buyCont} ,
+            #{sellCont},
+            #{buyPrice},
+            #{sellPrice},
+            #{buyUsdt},
+            #{sellUsdt},
+            #{buyTime},
+            #{sellTime},
+            #{orderStatus},
+            #{firstDirect},
+            #{updateTime}
+        )
+    </insert>
+
+
+    <!-- 根据主键更新一条信息所有数据 -->
+    <update id="updateByPrimaryKey" parameterType="com.slf.quant.facade.entity.strategy.QuantGridStats">
+        update quant_grid_stats set
+            account_id = #{accountId} ,
+            exchange = #{exchange} ,
+            strategy_id = #{strategyId} ,
+            currency = #{currency} ,
+            buy_order_id = #{buyOrderId} ,
+            sell_order_id = #{sellOrderId} ,
+            buy_cont = #{buyCont} ,
+            sell_cont = #{sellCont} ,
+            buy_price = #{buyPrice} ,
+            sell_price = #{sellPrice} ,
+            buy_usdt = #{buyUsdt} ,
+            sell_usdt = #{sellUsdt} ,
+            buy_time = #{buyTime} ,
+            sell_time = #{sellTime},
+            order_status = #{orderStatus},
+            first_direct = #{firstDirect},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <!-- 选择性更新数据 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.slf.quant.facade.entity.strategy.QuantGridStats">
+        update quant_grid_stats
+        <set>
+            <if test="accountId != null">
+                account_id = #{accountId} ,
+            </if>
+            <if test="exchange != null">
+                exchange = #{exchange} ,
+            </if>
+            <if test="strategyId != null">
+                strategy_id = #{strategyId} ,
+            </if>
+            <if test="currency != null">
+                currency = #{currency} ,
+            </if>
+            <if test="buyOrderId != null">
+                buy_order_id = #{buyOrderId} ,
+            </if>
+            <if test="sellOrderId != null">
+                sell_order_id = #{sellOrderId} ,
+            </if>
+            <if test="buyCont != null">
+                buy_cont = #{buyCont} ,
+            </if>
+            <if test="sellCont != null">
+                sell_cont = #{sellCont} ,
+            </if>
+            <if test="buyPrice != null">
+                buy_price = #{buyPrice} ,
+            </if>
+            <if test="sellPrice != null">
+                sell_price = #{sellPrice} ,
+            </if>
+            <if test="buyUsdt != null">
+                buy_usdt = #{buyUsdt} ,
+            </if>
+            <if test="sellUsdt != null">
+                sell_usdt = #{sellUsdt},
+            </if>
+            <if test="buyTime != null">
+                buy_time = #{buyTime},
+            </if>
+            <if test="sellTime != null">
+                sell_time = #{sellTime},
+            </if>
+            <if test="orderStatus != null">
+                order_status = #{orderStatus},
+            </if>
+            <if test="firstDirect != null">
+                first_direct = #{firstDirect},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 根据主键物理删除 -->
+    <delete id="delete" parameterType="java.lang.Long">1
+        delete from quant_grid_stats where id = #{id}
+    </delete>
+
+    <!-- 可分页的对象查询 -->
+    <select id="findList" resultType="com.slf.quant.facade.entity.strategy.QuantGridStats">
+        SELECT
+        <include refid="quantGridStatsColumns"/>
+        FROM quant_grid_stats a
+        WHERE 1=1
+
+        <if test="accountId != null">
+            and a.account_id = #{accountId}
+        </if>
+
+        <if test="strategyId != null">
+            and a.strategy_id = #{strategyId}
+        </if>
+        <if test="orderStatus != null">
+            and a.order_status = #{orderStatus}
+        </if>
+        <if test="currency != null and currency != ''">
+            and a.currency = #{currency}
+        </if>
+        order by a.id desc
+    </select>
+
+    <select id="selectAll" resultType="com.slf.quant.facade.entity.strategy.QuantGridStats">
+        SELECT
+        <include refid="quantGridStatsColumns"/>
+        FROM quant_grid_stats a
+    </select>
+    <select id="findSumInfo" resultType="com.slf.quant.facade.model.GridContractSumInfo">
+      select  ifnull(sum(buy_cont), 0) as sumbuyCont,
+      ifnull(sum(sell_cont), 0) as sumsellCont,
+      ifnull(sum(buy_cont * buy_price * #{contractValue}), 0)   as sumBuyBal,
+      ifnull(sum(sell_cont * sell_price * #{contractValue}), 0) as sumSellBal,
+      ifnull(avg(buy_price), 0) as avgBuyPrice,
+      ifnull(avg(sell_price), 0) as avgSellPrice
+      from quant_grid_stats
+      where strategy_id = #{strategyId}
+      and order_status =  #{orderStatus}
+    </select>
+
+</mapper>

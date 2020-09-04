@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>网格配置</title>
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/default/easyui.css" />
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/icon.css" />
+    <script type="text/javascript" src="../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../static/js/datetimeformat.js"></script>
+    <script type="text/javascript" src="../static/js/quantGridConfig.js"></script>
+</head>
+<body>
+<table id="quantGridConfigDataGrid" class="easyui-datagrid" fit="true" fitColumns="true" pagination="true" rownumbers="true"
+       singleSelect="true" url="/strategy/quantGridConfig/list" pageList="[30,40,50]" pageSize="30" toolbar="#tb" striped="true" title="网格配置">
+    <thead>
+    <tr>
+        <th field="id" width="120" align="center" hidden="true">主键</th>
+        <th field="accountId" width="120" align="center" hidden="true">账户id</th>
+        <th field="exchangeAccount" width="100" align="center">交易所账号</th>
+        <th field="contractCode" width="100" align="center">合约交易对</th>
+        <th field="priceDiffRate" width="100" align="center" hidden="true">网格价差率</th>
+        <th field="profitRate" width="100" align="center" hidden="true">止盈价差率</th>
+        <th field="entrustCont" width="100" align="center" hidden="true">单笔委托张数</th>
+        <th field="firstDirect" width="100" align="center" hidden="true">优先下单方向</th>
+        <th field="leverRate" width="100" align="center" hidden="true">杠杆倍数</th>
+        <th field="status" width="100"  formatter="printStatus" align="center">运行状态</th>
+        <th field="updateTime" width="100" formatter="formatDateByLong" align="center">更新时间</th>
+    </tr>
+    </thead>
+</table>
+
+<div id="tb">
+    <div>
+        <a href="javascript:openQuantGridConfigAddDialog()" class="easyui-linkbutton" iconCls="add" plain="true">添加</a>
+        <a href="javascript:openQuantGridConfigModifyDialog()" class="easyui-linkbutton" iconCls="update" plain="true">修改</a>
+        <a href="javascript:deleteQuantGridConfig()" class="easyui-linkbutton" iconCls="delete" plain="true">删除</a>
+        <a href="javascript:searchQuantGridConfig()" class="easyui-linkbutton" iconCls="search" plain="true">刷新</a>
+    </div>
+</div>
+
+<div id="editQuantGridConfig" class="easyui-dialog" closed="true" buttons="#editQuantGridConfigTb">
+    <form method="post" id="quantGridConfigForm">
+        <table cellspacing="8px">
+            <tr>
+                <td>交易所账号:</td>
+                <td><input id="exchangeAccount" name="exchangeAccount" type="text" /></td>
+            </tr>
+            <tr>
+                <td>合约交易对:</td>
+                <td>
+                    <select id="contractCode" class="easyui-combobox" name="contractCode"  data-options="required:true">
+                        <option value="BTC-USDT-SWAP">BTC-USDT-SWAP</option>
+                        <option value="ETH-USDT-SWAP">ETH-USDT-SWAP</option>
+                        <option value="EOS-USDT-SWAP">EOS-USDT-SWAP</option>
+                        <option value="BCH-USDT-SWAP">BCH-USDT-SWAP</option>
+                    </select>
+                    </td>
+            </tr>
+            <tr>
+                <td>网格价差率:</td>
+                <td><input id="priceDiffRate" name="priceDiffRate" type="text" /></td>
+            </tr>
+            <tr>
+                <td>止盈价差率:</td>
+                <td><input id="profitRate" name="profitRate" type="text" /></td>
+            </tr>
+            <tr>
+                <td>单笔委托张数:</td>
+                <td><input id="entrustCont" name="entrustCont" type="text" /></td>
+            </tr>
+            <tr>
+                <td>优先下单方向:</td>
+                <td>
+                    <select id="firstDirect" class="easyui-combobox" name="firstDirect"  data-options="required:true">
+                        <option value="buy">买入开多</option>
+                        <option value="sell">卖出开空</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>最大买入价格:</td>
+                <td><input id="maxBuyPrice" name="maxBuyPrice" type="text" /></td>
+            </tr>
+            <tr>
+                <td>最小卖出价格:</td>
+                <td><input id="minSellPrice" name="minSellPrice" type="text" /></td>
+            </tr>
+            <tr>
+                <td>杠杆倍数:</td>
+                <td><input id="leverRate" name="leverRate" type="text" /></td>
+            </tr>
+            <tr>
+                <td>手续费率:</td>
+                <td><input id="feeRate" name="feeRate" type="text" /></td>
+            </tr>
+            <tr>
+                <td>运行状态:</td>
+
+                <td>
+                    <select id="status" class="easyui-combobox" name="status" style="width:305px;"   data-options="required:true">
+                        <option value="0">已停止</option>
+                        <option value="1">运行中</option>
+                        <option value="3">启动中</option>
+                        <option value="4">停止中</option>
+                    </select>
+
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div id="editQuantGridConfigTb">
+    <a href="javascript:saveData()" class="easyui-linkbutton" iconCls="save">保存</a>
+    <a href="javascript:closeDlg()" class="easyui-linkbutton" iconCls="closed">关闭</a>
+</div>
+
+<div id="dlg2" class="easyui-dialog" closed="true" buttons="#dlgTb2">
+    <ul id="menuTree" class="easyui-tree"></ul>
+</div>
+
+<div id="dlgTb2">
+    <a href="javascript:setMenu()" class="easyui-linkbutton" iconCls="save">提交</a>
+    <a href="javascript:closeMenuSetDialog()" class="easyui-linkbutton" iconCls="closed">关闭</a>
+</div>
+
+</body>
+</html>

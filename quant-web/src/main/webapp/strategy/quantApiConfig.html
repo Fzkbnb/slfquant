@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>api配置</title>
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/default/easyui.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/icon.css"/>
+    <script type="text/javascript" src="../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../static/js/datetimeformat.js"></script>
+    <script type="text/javascript" src="../static/js/quantApiConfig.js"></script>
+</head>
+<body>
+<table id="quantApiConfigDataGrid" class="easyui-datagrid" fit="true" fitColumns="true" pagination="true"
+       rownumbers="true"
+       singleSelect="true" url="/strategy/quantApiConfig/list" pageList="[30,40,50]" pageSize="30" toolbar="#tb"
+       striped="true" title="api配置">
+    <thead>
+    <tr>
+        <th field="id" width="120" align="center" hidden="true">主键</th>
+        <th field="accountId" width="120" align="center" hidden="true">账户id</th>
+        <th field="exchangeAccount" width="100" align="center">交易所账号</th>
+        <th field="apiKey" width="100" align="center">apiKey</th>
+        <th field="secretKey" width="100" align="center" hidden="true">secretKey</th>
+        <th field="passPhrase" width="100" align="center" hidden="true">passPhrase</th>
+        <th field="authType" width="100" align="center" hidden="false">权限类型</th>
+        <th field="remark" width="100" align="center" hidden="false">备注</th>
+        <th field="updateTime" width="100" formatter="formatDateByLong" align="center">更新时间</th>
+    </tr>
+    </thead>
+</table>
+
+<div id="tb">
+    <div>
+        <a href="javascript:openQuantApiConfigAddDialog()" class="easyui-linkbutton" iconCls="add" plain="true">添加</a>
+        <a href="javascript:openQuantApiConfigModifyDialog()" class="easyui-linkbutton" iconCls="update"
+           plain="true">修改</a>
+        <a href="javascript:deleteQuantApiConfig()" class="easyui-linkbutton" iconCls="delete" plain="true">删除</a>
+        <a href="javascript:searchQuantApiConfig()" class="easyui-linkbutton" iconCls="search" plain="true">刷新</a>
+    </div>
+</div>
+
+<div id="editQuantApiConfig" class="easyui-dialog" closed="true" buttons="#editQuantApiConfigTb">
+    <form method="post" id="quantApiConfigForm">
+        <table cellspacing="8px">
+            <tr>
+                <td>交易所账号:</td>
+                <td>
+                    <select id="exchangeAccount" class="easyui-combobox" name="exchangeAccount"
+                            data-options="required:true">
+                        <option value="okex-1">okex-1</option>
+                        <option value="okex-2">okex-2</option>
+                        <option value="okex-3">okex-3</option>
+                    </select>
+            </tr>
+            <tr>
+                <td>apiKey:</td>
+                <td><input id="apiKey" name="apiKey" type="text"/></td>
+            </tr>
+            <tr>
+                <td>secretKey:</td>
+                <td><input id="secretKey" name="secretKey" type="text"/></td>
+            </tr>
+            <tr>
+                <td>passPhrase:</td>
+                <td><input id="passPhrase" name="passPhrase" type="text"/></td>
+            </tr>
+            <tr>
+                <td>权限类型:</td>
+                <td>
+                    <select id="authType" class="easyui-combobox" name="authType" data-options="required:true">
+                        <option value="1">只读</option>
+                        <option value="2">交易</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>备注:</td>
+                <td><input id="remark" name="remark" type="text"/></td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div id="editQuantApiConfigTb">
+    <a href="javascript:saveData()" class="easyui-linkbutton" iconCls="save">保存</a>
+    <a href="javascript:closeDlg()" class="easyui-linkbutton" iconCls="closed">关闭</a>
+</div>
+
+
+</body>
+</html>

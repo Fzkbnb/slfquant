@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.slf.quant.dao.QuantApiConfigMapper">
+
+
+    <!-- 基础列 -->
+    <sql id="quantApiConfigColumns">
+        a.id as id,
+        a.account_id as accountId,
+        a.exchange as exchange,
+        a.exchange_account as exchangeAccount,
+        a.api_key as apiKey,
+        a.secret_key as secretKey,
+        a.pass_phrase as passPhrase,
+        a.auth_type as authType,
+        a.divisor as divisor,
+        a.remark as remark,
+        a.create_time as createTime,
+        a.update_time as updateTime
+    </sql>
+
+    <!-- 普通插入 -->
+    <insert id="insert" parameterType="com.slf.quant.facade.entity.strategy.QuantApiConfig">
+        insert into quant_api_config(
+            id ,
+            account_id ,
+            exchange ,
+            exchange_account ,
+            api_key ,
+            secret_key ,
+            pass_phrase ,
+            auth_type ,
+            divisor,
+            remark,
+            create_time,
+            update_time
+        ) VALUES (
+            #{id} ,
+            #{accountId} ,
+            #{exchange} ,
+            #{exchangeAccount} ,
+            #{apiKey} ,
+            #{secretKey} ,
+            #{passPhrase} ,
+            #{authType} ,
+            #{divisor},
+            #{remark},
+            #{createTime},
+            #{updateTime}
+        )
+    </insert>
+
+
+    <!-- 根据主键更新一条信息所有数据 -->
+    <update id="updateByPrimaryKey" parameterType="com.slf.quant.facade.entity.strategy.QuantApiConfig">
+        update quant_api_config set
+            account_id = #{accountId} ,
+            exchange = #{exchange} ,
+            exchange_account = #{exchangeAccount} ,
+            api_key = #{apiKey} ,
+            secret_key = #{secretKey} ,
+            pass_phrase = #{passPhrase} ,
+            auth_type = #{authType} ,
+            divisor = #{divisor} ,
+            remark = #{remark} ,
+            create_time = #{createTime},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <!-- 选择性更新数据 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.slf.quant.facade.entity.strategy.QuantApiConfig">
+        update quant_api_config
+        <set>
+            <if test="accountId != null">
+                account_id = #{accountId} ,
+            </if>
+            <if test="exchange != null">
+                exchange = #{exchange} ,
+            </if>
+            <if test="exchangeAccount != null">
+                exchange_account = #{exchangeAccount} ,
+            </if>
+            <if test="apiKey != null">
+                api_key = #{apiKey} ,
+            </if>
+            <if test="secretKey != null">
+                secret_key = #{secretKey} ,
+            </if>
+            <if test="passPhrase != null">
+                pass_phrase = #{passPhrase} ,
+            </if>
+            <if test="authType != null">
+                auth_type = #{authType} ,
+            </if>
+            <if test="divisor != null">
+                divisor = #{divisor} ,
+            </if>
+            <if test="remark != null">
+                remark = #{remark} ,
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 根据主键物理删除 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from quant_api_config where id = #{id}
+    </delete>
+
+    <!-- 可分页的对象查询 -->
+    <select id="findList" resultType="com.slf.quant.facade.entity.strategy.QuantApiConfig">
+        SELECT
+        <include refid="quantApiConfigColumns"/>
+        FROM quant_api_config a
+        WHERE 1=1
+
+        <if test="accountId != null">
+            and a.account_id = #{accountId}
+        </if>
+
+        <if test="exchangeAccount != null and exchangeAccount != ''">
+            and a.exchange_account = #{exchangeAccount}
+        </if>
+        order by a.id desc
+    </select>
+    <select id="selectAll" resultType="com.slf.quant.facade.entity.strategy.QuantApiConfig">
+        SELECT
+        <include refid="quantApiConfigColumns"/>
+        FROM quant_api_config a
+    </select>
+
+
+    <select id="findByAccountIdAndExchangeAndExchangeAccount" resultType="com.slf.quant.facade.entity.strategy.QuantApiConfig">
+        SELECT
+        <include refid="quantApiConfigColumns"/>
+        FROM quant_api_config a
+        where a.account_id=#{accountId}
+        and a.exchange=#{exchange}
+        and a.exchange_account=#{exchangeAccount}
+    </select>
+
+
+</mapper>

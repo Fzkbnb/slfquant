@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.slf.quant.dao.QuantGridConfigMapper">
+
+    <!-- 基础列 -->
+    <sql id="quantGridConfigColumns">
+        a.id as id,
+        a.account_id as accountId,
+        a.exchange as exchange,
+        a.exchange_account as exchangeAccount,
+        a.currency as currency,
+        a.price_diff_rate as priceDiffRate,
+        a.profit_rate as profitRate,
+        a.entrust_cont as entrustCont,
+        a.enable_maker as enableMaker,
+        a.contract_code as contractCode,
+        a.first_direct as firstDirect,
+        a.max_buy_price as maxBuyPrice,
+        a.min_sell_price as minSellPrice,
+        a.fee_rate as feeRate,
+        a.lever_rate as leverRate,
+        a.status as status,
+        a.create_time as createTime,
+        a.update_time as updateTime
+    </sql>
+
+    <!-- 普通插入 -->
+    <insert id="insert" parameterType="com.slf.quant.facade.entity.strategy.QuantGridConfig">
+        insert into quant_grid_config(
+            id ,
+            account_id ,
+            exchange ,
+            exchange_account ,
+            currency ,
+            price_diff_rate ,
+            profit_rate ,
+            entrust_cont ,
+            enable_maker,
+            contract_code,
+            first_direct,
+            max_buy_price,
+            min_sell_price,
+            fee_rate,
+            lever_rate,
+            status,
+            create_time,
+            update_time
+        ) VALUES (
+            #{id} ,
+            #{accountId} ,
+            #{exchange} ,
+            #{exchangeAccount} ,
+            #{currency} ,
+            #{priceDiffRate} ,
+            #{profitRate} ,
+            #{entrustCont} ,
+            #{enableMaker},
+            #{contractCode},
+            #{firstDirect},
+            #{maxBuyPrice},
+            #{minSellPrice},
+            #{feeRate},
+            #{leverRate},
+            #{status},
+            #{createTime},
+            #{updateTime}
+        )
+    </insert>
+
+
+    <!-- 根据主键更新一条信息所有数据 -->
+    <update id="updateByPrimaryKey" parameterType="com.slf.quant.facade.entity.strategy.QuantGridConfig">
+        update quant_grid_config set
+            account_id = #{accountId} ,
+            exchange = #{exchange} ,
+            exchange_account = #{exchangeAccount} ,
+            currency = #{currency} ,
+            price_diff_rate = #{priceDiffRate} ,
+            profit_rate = #{profitRate} ,
+            entrust_cont = #{entrustCont} ,
+            enable_maker = #{enableMaker} ,
+            contract_code = #{contractCode} ,
+            first_direct = #{firstDirect} ,
+            max_buy_price = #{maxBuyPrice} ,
+            min_sell_price = #{minSellPrice} ,
+            fee_rate = #{feeRate} ,
+            lever_rate = #{leverRate},
+            status = #{status},
+            create_time = #{createTime},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <!-- 选择性更新数据 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.slf.quant.facade.entity.strategy.QuantGridConfig">
+        update quant_grid_config
+        <set>
+            <if test="accountId != null">
+                account_id = #{accountId} ,
+            </if>
+            <if test="exchange != null">
+                exchange = #{exchange} ,
+            </if>
+            <if test="exchangeAccount != null">
+                exchange_account = #{exchangeAccount} ,
+            </if>
+            <if test="currency != null">
+                currency = #{currency} ,
+            </if>
+            <if test="priceDiffRate != null">
+                price_diff_rate = #{priceDiffRate} ,
+            </if>
+            <if test="profitRate != null">
+                profit_rate = #{profitRate} ,
+            </if>
+            <if test="entrustCont != null">
+                entrust_cont = #{entrustCont} ,
+            </if>
+            <if test="enableMaker != null">
+                enable_maker = #{enableMaker} ,
+            </if>
+            <if test="contractCode != null">
+                contract_code = #{contractCode} ,
+            </if>
+            <if test="firstDirect != null">
+                first_direct = #{firstDirect} ,
+            </if>
+            <if test="maxBuyPrice != null">
+                max_buy_price = #{maxBuyPrice} ,
+            </if>
+            <if test="minSellPrice != null">
+                min_sell_price = #{minSellPrice},
+            </if>
+            <if test="feeRate != null">
+                fee_rate = #{feeRate},
+            </if>
+            <if test="leverRate != null">
+                lever_rate = #{leverRate},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 根据主键物理删除 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from quant_grid_config where id = #{id}
+    </delete>
+
+    <!-- 可分页的对象查询 -->
+    <select id="findList" resultType="com.slf.quant.facade.entity.strategy.QuantGridConfig">
+        SELECT
+        <include refid="quantGridConfigColumns"/>
+        FROM quant_grid_config a
+        WHERE 1=1
+
+        <if test="accountId != null">
+            and a.account_id = #{accountId}
+        </if>
+
+        <if test="exchangeAccount != null and exchangeAccount != ''">
+            and a.exchange_account = #{exchangeAccount}
+        </if>
+
+        <if test="currency != null and currency != ''">
+            and a.currency = #{currency}
+        </if>
+        order by a.id desc
+    </select>
+
+    <select id="selectAll" resultType="com.slf.quant.facade.entity.strategy.QuantGridConfig">
+        SELECT
+        <include refid="quantGridConfigColumns"/>
+        FROM quant_grid_config a
+    </select>
+    <update id="changeStatus">
+        update quant_grid_config set
+            status =#{status}
+        where id = #{id}
+    </update>
+
+    <update id="changeAllStatus">
+        update quant_grid_config set
+            status =#{status}
+        where 1=1
+    </update>
+
+
+</mapper>

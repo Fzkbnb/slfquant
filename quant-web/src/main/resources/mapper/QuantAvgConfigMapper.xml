@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.slf.quant.dao.QuantAvgConfigMapper">
+    <!-- 基础列 -->
+    <sql id="quantAvgConfigColumns">
+        a.id as id,
+        a.account_id as accountId,
+        a.exchange as exchange,
+        a.exchange_account as exchangeAccount,
+        a.currency as currency,
+        a.first_base_price as firstBasePrice,
+        a.current_base_price as currentBasePrice,
+        a.price_up_rate as priceUpRate,
+        a.price_down_rate as priceDownRate,
+        a.symbol as symbol,
+        a.usdt_capital as usdtCapital,
+        a.usdt_balance as usdtBalance,
+        a.coin_balance as coinBalance,
+        a.last_price as lastPrice,
+        a.status as status,
+        a.trade_count as tradeCount,
+        a.create_time as createTime,
+        a.update_time as updateTime
+    </sql>
+
+    <!-- 普通插入 -->
+    <insert id="insert" parameterType="com.slf.quant.facade.entity.strategy.QuantAvgConfig">
+        insert into quant_avg_config(
+            id ,
+            account_id ,
+            exchange ,
+            exchange_account ,
+            currency ,
+            first_base_price ,
+            current_base_price ,
+            price_up_rate ,
+            price_down_rate,
+            symbol,
+            usdt_capital,
+            usdt_balance,
+            coin_balance,
+            last_price,
+            status,
+            trade_count,
+            create_time,
+            update_time
+        ) VALUES (
+            #{id} ,
+            #{accountId} ,
+            #{exchange} ,
+            #{exchangeAccount} ,
+            #{currency} ,
+            #{firstBasePrice} ,
+            #{currentBasePrice} ,
+            #{priceUpRate} ,
+            #{priceDownRate},
+            #{symbol},
+            #{usdtCapital},
+            #{usdtBalance},
+            #{coinBalance},
+            #{lastPrice},
+            #{status},
+            #{tradeCount},
+            #{createTime},
+            #{updateTime}
+        )
+    </insert>
+
+
+    <!-- 根据主键更新一条信息所有数据 -->
+    <update id="updateByPrimaryKey" parameterType="com.slf.quant.facade.entity.strategy.QuantAvgConfig">
+        update quant_avg_config set
+            account_id = #{accountId} ,
+            exchange = #{exchange} ,
+            exchange_account = #{exchangeAccount} ,
+            currency = #{currency} ,
+            first_base_price = #{firstBasePrice} ,
+            current_base_price = #{currentBasePrice} ,
+            price_up_rate = #{priceUpRate} ,
+            price_down_rate = #{priceDownRate} ,
+            symbol = #{symbol} ,
+            usdt_capital = #{usdtCapital} ,
+            usdt_balance = #{usdtBalance} ,
+            coin_balance = #{coinBalance} ,
+            last_price = #{lastPrice} ,
+            status = #{status},
+            trade_count = #{tradeCount},
+            create_time = #{createTime},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <!-- 选择性更新数据 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.slf.quant.facade.entity.strategy.QuantAvgConfig">
+        update quant_avg_config
+        <set>
+            <if test="accountId != null">
+                account_id = #{accountId} ,
+            </if>
+            <if test="exchange != null">
+                exchange = #{exchange} ,
+            </if>
+            <if test="exchangeAccount != null">
+                exchange_account = #{exchangeAccount} ,
+            </if>
+            <if test="currency != null">
+                currency = #{currency} ,
+            </if>
+            <if test="firstBasePrice != null">
+                first_base_price = #{firstBasePrice} ,
+            </if>
+            <if test="currentBasePrice != null">
+                current_base_price = #{currentBasePrice} ,
+            </if>
+            <if test="priceUpRate != null">
+                price_up_rate = #{priceUpRate} ,
+            </if>
+            <if test="priceDownRate != null">
+                price_down_rate = #{priceDownRate} ,
+            </if>
+            <if test="symbol != null">
+                symbol = #{symbol} ,
+            </if>
+            <if test="usdtCapital != null">
+                usdt_capital = #{usdtCapital} ,
+            </if>
+            <if test="usdtBalance != null">
+                usdt_balance = #{usdtBalance} ,
+            </if>
+            <if test="coinBalance != null">
+                coin_balance = #{coinBalance},
+            </if>
+            <if test="lastPrice != null">
+                last_price = #{lastPrice},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="tradeCount != null">
+                trade_count = #{tradeCount},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 根据主键物理删除 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from quant_avg_config where id = #{id}
+    </delete>
+
+    <!-- 可分页的对象查询 -->
+    <select id="findList" resultType="com.slf.quant.facade.entity.strategy.QuantAvgConfig">
+        SELECT
+        <include refid="quantAvgConfigColumns"/>
+        FROM quant_avg_config a
+        WHERE 1=1
+
+        <if test="accountId != null">
+            and a.account_id = #{accountId}
+        </if>
+        <if test="status != null">
+            and a.status = #{status}
+        </if>
+        <if test="exchangeAccount != null and exchangeAccount != ''">
+            and a.exchange_account = #{exchangeAccount}
+        </if>
+
+        <if test="currency != null and currency != ''">
+            and a.currency = #{currency}
+        </if>
+        order by a.id desc
+    </select>
+
+    <select id="selectAll" resultType="com.slf.quant.facade.entity.strategy.QuantAvgConfig">
+        SELECT
+        <include refid="quantAvgConfigColumns"/>
+        FROM quant_avg_config a
+    </select>
+    <update id="changeStatus">
+        update quant_avg_config set
+            status =#{status}
+        where id = #{id}
+    </update>
+
+    <update id="changeAllStatus">
+        update quant_avg_config set
+            status =#{status}
+        where 1=1
+    </update>
+
+
+</mapper>
