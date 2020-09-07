@@ -1,3 +1,18 @@
+/**
+ *
+ * 增加formatString功能
+ *
+ * 使用方法：$.formatString('字符串{0}字符串{1}字符串','第一个变量','第二个变量');
+ *
+ * @returns 格式化后的字符串
+ */
+$.formatString = function (str) {
+    for (var i = 0; i < arguments.length - 1; i++) {
+        str = str.replace("{" + i + "}", arguments[i + 1]);
+    }
+    return str;
+};
+
 function printStatus(value, row, index) {
 
     if (value == 1) {
@@ -11,6 +26,57 @@ function printStatus(value, row, index) {
     } else if (value == 4) {
         return '<font color="red">停止中</font>';
     }
+}
+
+function printStats(value, row, index) {
+    return $.formatString('<a href="javascript:void(0)" data-options="plain:true,iconCls:\'fi-page-edit icon-blue\'" onclick="getGridStats(\'{0}\');" >统计详情</a>', row.id);
+}
+
+/**
+ * 打开统计信息详情
+ */
+function getGridStats(id) {
+    $('#tbody').text('');
+    $.ajax({
+        url: '/strategy/quantGridConfig/stats',
+        type: 'post',
+        data: {id: id},
+        dataType: 'json',
+        success: function (data) {
+
+            if (data.code == 200) {
+                $('#statsTable').dialog({
+                    title: '统计信息',
+                    closed: false,
+                    top: $(window).height() / 4,
+                    width: 450,
+                    height: 400,
+                    onOpen: function () {
+                        var html = '';
+                        html += '<thread>\n' +
+                            '                    <tr>\n' +
+                            '<th width="200" align="center">参数名</th>\n' +
+                            '<th width="200" align="center">参数值</th>\n' +
+                            '                    </tr>\n' +
+                            '                </thread>';
+                        $.each(data.data, function (n, value) {
+                            html += '<tr>';
+                            html += '<td width="200" align="center">' + value.key + '</td>';
+                            html += '<td width="200" align="center">' + value.value + '</td>';
+                            html += '</tr>';
+                        });
+                        $('#tbody').html(html);
+                    }
+                });
+
+            } else {
+                parent.$.messager.alert('提示', data.message, 'info');
+            }
+
+        }
+    });
+
+
 }
 
 /**

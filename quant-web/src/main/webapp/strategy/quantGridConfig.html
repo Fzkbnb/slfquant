@@ -26,6 +26,7 @@
         <th field="firstDirect" width="100" align="center" hidden="true">优先下单方向</th>
         <th field="leverRate" width="100" align="center" hidden="true">杠杆倍数</th>
         <th field="status" width="100"  formatter="printStatus" align="center">运行状态</th>
+        <th field="stats" width="100"  formatter="printStats" align="center">统计信息</th>
         <th field="updateTime" width="100" formatter="formatDateByLong" align="center">更新时间</th>
     </tr>
     </thead>
@@ -109,6 +110,12 @@
             </tr>
         </table>
     </form>
+</div>
+<div id="statsTable" class="easyui-dialog" closed="true">
+        <table cellspacing="0px">
+            <tbody id="tbody">
+            </tbody>
+        </table>
 </div>
 
 <div id="editQuantGridConfigTb">

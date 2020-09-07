@@ -1,6 +1,8 @@
 package com.slf.quant.controller.strategy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -9,8 +11,12 @@ import com.slf.quant.config.BaseController;
 import com.slf.quant.domain.SuccessCode;
 import com.slf.quant.facade.bean.PaginateResult;
 import com.slf.quant.facade.bean.Pagination;
+import com.slf.quant.facade.consts.KeyConst;
 import com.slf.quant.facade.entity.strategy.QuantGridConfig;
+import com.slf.quant.facade.model.StrategyStatusModel;
 import com.slf.quant.facade.service.strategy.QuantGridConfigService;
+import com.slf.quant.strategy.consts.TradeConst;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -53,6 +59,32 @@ public class QuantGridConfigController extends BaseController
         Map<String, Object> map = new HashMap<>();
         map.put("total", result.getPage().getTotalRows());
         map.put("rows", result.getList());
+        return map;
+    }
+    
+    @PostMapping("/stats")
+    public Map<String, Object> stats(Long id)
+    {
+        String key = KeyConst.REDISKEY_GRID_STATUS + id;
+        Map<String, Object> map = new HashMap<>();
+        List<StrategyStatusModel> list = TradeConst.grid_stats_map.get(key);
+        // List<StrategyStatusModel> list = new ArrayList<>();
+        // StrategyStatusModel model = new StrategyStatusModel();
+        // model.setKey("1");
+        // model.setValue("123");
+        // list.add(model);
+        // map.put("data", list);
+        // map.put("code", 200);
+        if (CollectionUtils.isNotEmpty(list))
+        {
+            map.put("data", list);
+            map.put("code", 200);
+        }
+        else
+        {
+            map.put("message", "统计信息不存在！");
+            map.put("code", -1);
+        }
         return map;
     }
     

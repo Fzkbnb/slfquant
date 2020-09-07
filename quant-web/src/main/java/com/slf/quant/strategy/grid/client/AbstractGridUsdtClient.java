@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.slf.quant.facade.consts.KeyConst;
 import com.slf.quant.facade.entity.strategy.QuantGridConfig;
 import com.slf.quant.facade.entity.strategy.QuantGridStats;
 import com.slf.quant.facade.model.*;
@@ -223,7 +224,8 @@ public abstract class AbstractGridUsdtClient
             models.add(m2);
             models.add(m3);
             models.add(m4);
-            // redisUtils.set(KeyConst.REDISKEY_GRID_STATUS + config.getId(), models);
+            TradeConst.grid_stats_map.put(KeyConst.REDISKEY_GRID_STATUS + config.getId(),models);
+//             redisUtils.set(KeyConst.REDISKEY_GRID_STATUS + config.getId(), models);
         }
     }
     
