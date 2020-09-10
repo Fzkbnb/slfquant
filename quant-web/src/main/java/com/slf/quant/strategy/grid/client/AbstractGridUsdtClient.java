@@ -10,9 +10,11 @@ import java.util.concurrent.Executors;
 
 import com.slf.quant.facade.consts.KeyConst;
 import com.slf.quant.facade.entity.strategy.QuantGridConfig;
+import com.slf.quant.facade.entity.strategy.QuantGridProfit;
 import com.slf.quant.facade.entity.strategy.QuantGridStats;
 import com.slf.quant.facade.model.*;
 import com.slf.quant.facade.service.strategy.QuantGridConfigService;
+import com.slf.quant.facade.service.strategy.QuantGridProfitService;
 import com.slf.quant.facade.service.strategy.QuantGridStatsService;
 import com.slf.quant.facade.utils.SpringContext;
 import org.apache.commons.lang3.ObjectUtils;
@@ -31,11 +33,11 @@ public abstract class AbstractGridUsdtClient
     
     protected QuantGridConfigService quantGridConfigService = SpringContext.getBean("quantGridConfigServiceImpl");
     
+    protected QuantGridProfitService quantGridProfitService = SpringContext.getBean("quantGridProfitServiceImpl");
+    
     protected QuantGridConfig        config;
     
     protected List<QuantGridStats>   orders                 = new ArrayList<>();
-    
-    protected ExecutorService        orderEs;
     
     protected String                 apiKey;
     
@@ -75,6 +77,8 @@ public abstract class AbstractGridUsdtClient
     
     protected long                   lastCacheTime          = 0;
     
+    protected long                   lastSaveProfitTime     = 0;
+    
     protected QuoteDepth             currentDepthModel;
     
     protected BigDecimal             startSellPrice;
@@ -91,7 +95,6 @@ public abstract class AbstractGridUsdtClient
         this.secretKey = secretKey;
         this.passPhrase = passPhrase;
         this.config = config;
-        orderEs = Executors.newSingleThreadExecutor();
     }
     
     /**
@@ -164,7 +167,8 @@ public abstract class AbstractGridUsdtClient
     private void cacheSumInfo()
     {
         // 每隔10秒监控一次
-        if (System.currentTimeMillis() - lastCacheTime > 10000)
+        long curtime = System.currentTimeMillis();
+        if (curtime - lastCacheTime > 10000)
         {
             if (null == currentDepthModel)
             { return; }
@@ -224,8 +228,19 @@ public abstract class AbstractGridUsdtClient
             models.add(m2);
             models.add(m3);
             models.add(m4);
-            TradeConst.grid_stats_map.put(KeyConst.REDISKEY_GRID_STATUS + config.getId(),models);
-//             redisUtils.set(KeyConst.REDISKEY_GRID_STATUS + config.getId(), models);
+            TradeConst.grid_stats_map.put(KeyConst.REDISKEY_GRID_STATUS + config.getId(), models);
+            // redisUtils.set(KeyConst.REDISKEY_GRID_STATUS + config.getId(), models);
+            // 每隔一小时保存一次盈亏统计信息到数据库用于绘制折线图
+            if (curtime - lastSaveProfitTime > 60000L * 60)
+            {
+                long displayTime = curtime - curtime % (60000 * 60);
+                QuantGridProfit quantGridProfit = new QuantGridProfit();
+                quantGridProfit.setStrategyId(config.getId());
+                quantGridProfit.setDisplayTime(displayTime);
+                quantGridProfit.setProfit(model.getProfit().add(model.getProfitUnreal()).setScale(2, BigDecimal.ROUND_DOWN));
+                quantGridProfitService.insert(quantGridProfit);
+                lastSaveProfitTime = displayTime;
+            }
         }
     }
     
@@ -726,7 +741,6 @@ public abstract class AbstractGridUsdtClient
     public void stop()
     {
         log.info(">>>策略{},关闭程序<<<", config.getId());
-        orderEs.shutdown();
         quantGridConfigService.changeStatus(config.getId(), 0);
         stopFlag = true;
         isStoped = true;

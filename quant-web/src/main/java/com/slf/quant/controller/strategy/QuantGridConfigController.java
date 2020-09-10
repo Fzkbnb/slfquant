@@ -1,5 +1,6 @@
 package com.slf.quant.controller.strategy;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,23 +13,22 @@ import com.slf.quant.domain.SuccessCode;
 import com.slf.quant.facade.bean.PaginateResult;
 import com.slf.quant.facade.bean.Pagination;
 import com.slf.quant.facade.consts.KeyConst;
+
 import com.slf.quant.facade.entity.strategy.QuantGridConfig;
+import com.slf.quant.facade.entity.strategy.QuantGridProfit;
 import com.slf.quant.facade.model.StrategyStatusModel;
 import com.slf.quant.facade.service.strategy.QuantGridConfigService;
+import com.slf.quant.facade.service.strategy.QuantGridProfitService;
 import com.slf.quant.strategy.consts.TradeConst;
+
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.slf.quant.domain.ServiceVO;
-import com.slf.quant.entity.Role;
-import com.slf.quant.service.RoleService;
 
 /**
  * @author slf
@@ -41,6 +41,9 @@ public class QuantGridConfigController extends BaseController
 {
     @Autowired(required = false)
     private QuantGridConfigService quantGridConfigService;
+    
+    @Autowired(required = false)
+    private QuantGridProfitService quantGridProfitService;
     
     /**
      * 查询所有
@@ -55,6 +58,8 @@ public class QuantGridConfigController extends BaseController
     // @RequiresPermissions(value = "查询列表")
     public Map<String, Object> list(Pagination pagination, QuantGridConfig entity)
     {
+        Long accountId = getOnlineUserId();
+        entity.setAccountId(accountId);
         PaginateResult<QuantGridConfig> result = quantGridConfigService.search(pagination, entity);
         Map<String, Object> map = new HashMap<>();
         map.put("total", result.getPage().getTotalRows());
@@ -68,13 +73,6 @@ public class QuantGridConfigController extends BaseController
         String key = KeyConst.REDISKEY_GRID_STATUS + id;
         Map<String, Object> map = new HashMap<>();
         List<StrategyStatusModel> list = TradeConst.grid_stats_map.get(key);
-        // List<StrategyStatusModel> list = new ArrayList<>();
-        // StrategyStatusModel model = new StrategyStatusModel();
-        // model.setKey("1");
-        // model.setValue("123");
-        // list.add(model);
-        // map.put("data", list);
-        // map.put("code", 200);
         if (CollectionUtils.isNotEmpty(list))
         {
             map.put("data", list);
@@ -85,6 +83,21 @@ public class QuantGridConfigController extends BaseController
             map.put("message", "统计信息不存在！");
             map.put("code", -1);
         }
+        map.put("data", list);
+        map.put("code", 200);
+        // 折线图数据
+        QuantGridProfit param = new QuantGridProfit();
+        param.setStrategyId(id);
+        List<QuantGridProfit> profits = quantGridProfitService.findList(param);
+        QuantGridProfit p1 = new QuantGridProfit();
+        p1.setDisplayTime(1L);
+        p1.setProfit(BigDecimal.valueOf(3));
+        QuantGridProfit p2 = new QuantGridProfit();
+        p2.setDisplayTime(2L);
+        p2.setProfit(BigDecimal.valueOf(1));
+        profits.add(p1);
+        profits.add(p2);
+        map.put("profits", profits);
         return map;
     }
     

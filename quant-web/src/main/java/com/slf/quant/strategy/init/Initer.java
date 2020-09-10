@@ -4,6 +4,8 @@ import com.slf.quant.facade.consts.KeyConst;
 import com.slf.quant.facade.service.strategy.QuantGridStatsService;
 import com.slf.quant.facade.utils.SpringContext;
 import com.slf.quant.strategy.avg.task.QuantAvgConfigScanTask;
+import com.slf.quant.strategy.triangular.client.AbstractTriangularClient;
+import com.slf.quant.strategy.triangular.quote.QuoteTtriangularWebsocketTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -33,7 +35,8 @@ public class Initer implements ApplicationRunner
     
     @Autowired
     private QuoteAnalysisTask       quoteAnalysisTask;
-    
+    @Autowired
+    private QuoteTtriangularWebsocketTask       quoteTtriangularWebsocketTask;
      @Autowired
      private QuantAvgConfigScanTask quantAvgConfigScanTask;
     @Override
@@ -46,6 +49,11 @@ public class Initer implements ApplicationRunner
         quantGridConfigScanTask.start();
         log.info(">>>开始启动调平策略配置扫描任务<<<");
         quantAvgConfigScanTask.start();
+        //todo 待改造，目前只支持行情监控
+        log.info(">>>开始启动套利任务<<<");
+        AbstractTriangularClient client = new AbstractTriangularClient(null,null,null,null);
+        quoteTtriangularWebsocketTask.start();
+        client.start();
 
         // 根据命令行参数确定要启动的策略类型
 //        String type = KeyConst.STRATEGYTYPE_GRID;

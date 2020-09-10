@@ -42,6 +42,8 @@ public class QuantAvgConfigController extends BaseController
     // @RequiresPermissions(value = "查询列表")
     public Map<String, Object> list(Pagination pagination, QuantAvgConfig entity)
     {
+        Long accountId = getOnlineUserId();
+        entity.setAccountId(accountId);
         PaginateResult<QuantAvgConfig> result = quantAvgConfigService.search(pagination, entity);
         Map<String, Object> map = new HashMap<>();
         map.put("total", result.getPage().getTotalRows());

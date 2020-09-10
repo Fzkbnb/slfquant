@@ -49,8 +49,8 @@ function getGridStats(id) {
                     title: '统计信息',
                     closed: false,
                     top: $(window).height() / 4,
-                    width: 450,
-                    height: 400,
+                    width: 700,
+                    height: 600,
                     onOpen: function () {
                         var html = '';
                         html += '<thread>\n' +
@@ -65,7 +65,51 @@ function getGridStats(id) {
                             html += '<td width="200" align="center">' + value.value + '</td>';
                             html += '</tr>';
                         });
+
                         $('#tbody').html(html);
+                        //绘制折线图
+                        var times =[];
+                        var profits = [];
+                        $.each(data.profits, function (n, value) {
+                            times.push(value.displayTime);
+                            profits.push(value.profit);
+                        });
+                        var myChart = echarts.init(document.getElementById('main'));
+                        // 指定图表的配置项和数据
+                        var option={
+                            //标题
+                            title:{
+                                text:'盈亏统计'
+                            },
+                            //工具箱
+                            //保存图片
+                            toolbox:{
+                                show:true,
+                                feature:{
+                                    saveAsImage:{
+                                        show:true
+                                    }
+                                }
+                            },
+                            //图例-每一条数据的名字叫销量
+                            legend:{
+                                data:['盈亏值(usdt)']
+                            },
+                            //x轴
+                            xAxis:{
+                                data:times
+                            },
+                            //y轴没有显式设置，根据值自动生成y轴
+                            yAxis:{},
+                            //数据-data是最终要显示的数据
+                            series:[{
+                                name:'盈亏',
+                                type:'line',
+                                data:profits
+                            }]
+                        };
+                        // 使用刚指定的配置项和数据显示图表。
+                        myChart.setOption(option);
                     }
                 });
 

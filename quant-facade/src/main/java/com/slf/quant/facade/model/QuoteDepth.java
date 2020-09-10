@@ -1,6 +1,5 @@
 package com.slf.quant.facade.model;
 
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -13,11 +12,15 @@ public class QuoteDepth implements Comparable
 {
     private long               updateTime;
     
-    private BigDecimal ask;
+    private BigDecimal         ask;
     
     private BigDecimal         bid;
     
     private BigDecimal         avg;
+    
+    private BigDecimal         bidAmt;
+    
+    private BigDecimal         askAmt;
     
     private String             instrument_id;
     
@@ -46,5 +49,21 @@ public class QuoteDepth implements Comparable
     {
         QuoteDepth quoteDepth = (QuoteDepth) o;
         return this.avg.compareTo(quoteDepth.getAvg());
+    }
+    
+    public void buildtriangularAskBid()
+    {
+        if (CollectionUtils.isNotEmpty(bids))
+        {
+            bid = new BigDecimal(bids.get(0).get(0));
+            bidAmt =new BigDecimal(bids.get(0).get(1));
+        }
+        if (CollectionUtils.isNotEmpty(asks))
+        {
+            ask = new BigDecimal(asks.get(0).get(0));
+            askAmt = new BigDecimal(asks.get(0).get(1));
+        }
+        avg = ask.add(bid).divide(BigDecimal.valueOf(2), 8, BigDecimal.ROUND_HALF_UP);
+        updateTime = System.currentTimeMillis();
     }
 }

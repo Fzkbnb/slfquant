@@ -2742,5 +2742,17 @@ CREATE TABLE `quant_avg_config`
   `update_time`        bigint         NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ROW_FORMAT = COMPACT COMMENT ='动态平衡配置表';
-
+--移除模版多余的菜单
 delete  from `t_role_menu` where menu_id in(10,20,30,40,50);
+
+
+DROP TABLE IF EXISTS `quant_grid_profit`;
+CREATE TABLE `quant_grid_profit`
+(
+  `id`           bigint COMMENT 'ID',
+  `strategy_id`  bigint         NOT NULL COMMENT '策略id',
+  `display_time` bigint         NOT NULL COMMENT '展示时间',
+  `profit`       decimal(16, 8) NOT NULL COMMENT '盈利',
+  PRIMARY KEY (`id`)
+) ROW_FORMAT = COMPACT COMMENT ='网格策略收益统计表';s
+

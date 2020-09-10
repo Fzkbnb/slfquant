@@ -35,6 +35,8 @@ public class QuantApiConfigController extends BaseController
     @PostMapping("/list")
     public Map<String, Object> list(Pagination pagination, QuantApiConfig entity)
     {
+        Long accountId = getOnlineUserId();
+        entity.setAccountId(accountId);
         PaginateResult<QuantApiConfig> result = quantApiConfigService.search(pagination, entity);
         Map<String, Object> map = new HashMap<>();
         map.put("total", result.getPage().getTotalRows());

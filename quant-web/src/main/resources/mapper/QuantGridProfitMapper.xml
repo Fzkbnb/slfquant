@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.slf.quant.dao.QuantGridProfitMapper">
+
+    <!-- 基础列 -->
+    <sql id="quantGridProfitColumns">
+        a.id as id,
+        a.strategy_id as strategyId,
+        a.profit as profit,
+        a.display_time as displayTime
+    </sql>
+
+    <!-- 普通插入 -->
+    <insert id="insert" parameterType="com.slf.quant.facade.entity.strategy.QuantGridProfit">
+        insert into quant_grid_profit(
+            id ,
+            strategy_id ,
+            profit ,
+            display_time
+        ) VALUES (
+            #{id} ,
+            #{strategyId} ,
+            #{profit} ,
+            #{displayTime}
+        )
+    </insert>
+
+
+    <!-- 根据主键更新一条信息所有数据 -->
+    <update id="updateByPrimaryKey" parameterType="com.slf.quant.facade.entity.strategy.QuantGridProfit">
+        update quant_grid_profit set
+            strategy_id = #{strategyId} ,
+            profit = #{profit} ,
+            display_time = #{displayTime}
+        where id = #{id}
+    </update>
+
+    <!-- 选择性更新数据 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.slf.quant.facade.entity.strategy.QuantGridProfit">
+        update quant_grid_profit
+        <set>
+            <if test="strategyId != null">
+                strategy_id = #{strategyId} ,
+            </if>
+            <if test="profit != null">
+                profit = #{profit} ,
+            </if>
+            <if test="displayTime != null">
+                display_time = #{displayTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 根据主键物理删除 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from quant_grid_profit where id = #{id}
+    </delete>
+
+    <!-- 可分页的对象查询 -->
+    <select id="findList" resultType="com.slf.quant.facade.entity.strategy.QuantGridProfit">
+        SELECT
+        <include refid="quantGridProfitColumns"/>
+        FROM quant_grid_profit a
+        WHERE 1=1
+        <if test="strategyId != null">
+            and a.strategy_id = #{strategyId}
+        </if>
+        order by a.display_time desc
+    </select>
+
+    <select id="selectAll" resultType="com.slf.quant.facade.entity.strategy.QuantGridProfit">
+        SELECT
+        <include refid="quantGridProfitColumns"/>
+        FROM quant_grid_profit a
+    </select>
+
+
+</mapper>
