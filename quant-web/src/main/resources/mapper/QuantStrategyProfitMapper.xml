@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.slf.quant.dao.QuantStrategyProfitMapper">
+
+    <!-- 基础列 -->
+    <sql id="quantStrategyProfitColumns">
+        a.id as id,
+        a.account_id as accountId,
+        a.strategy_id as strategyId,
+        a.profit as profit,
+        a.strategy_type as strategyType,
+        a.display_time as displayTime
+    </sql>
+    <sql id="quantStrategyProfitJoinColumns">
+        a.id as id,
+        a.account_id as accountId,
+        a.strategy_id as strategyId,
+        a.profit as profit,
+        a.strategy_type as strategyType,
+        a.display_time as displayTime,
+        b.user_name as userName
+    </sql>
+    <!-- 普通插入 -->
+    <insert id="insert" parameterType="com.slf.quant.facade.entity.strategy.QuantStrategyProfit">
+        insert into quant_strategy_profit(
+            id ,
+            account_id ,
+            strategy_id ,
+            profit ,
+            strategy_type,
+            display_time
+        ) VALUES (
+            #{id} ,
+            #{accountId} ,
+            #{strategyId} ,
+            #{profit} ,
+             #{strategyType} ,
+            #{displayTime}
+        )
+    </insert>
+
+
+    <!-- 根据主键更新一条信息所有数据 -->
+    <update id="updateByPrimaryKey" parameterType="com.slf.quant.facade.entity.strategy.QuantStrategyProfit">
+        update ,quant_strategy_profit set
+            account_id = #{accountId} ,
+            strategy_id = #{strategyId} ,
+            strategy_type = #{strategyType} ,
+            profit = #{profit} ,
+            display_time = #{displayTime}
+        where id = #{id}
+    </update>
+
+    <!-- 选择性更新数据 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.slf.quant.facade.entity.strategy.QuantStrategyProfit">
+        update ,quant_strategy_profit
+        <set>
+            <if test="strategyId != null">
+                strategy_id = #{strategyId} ,
+            </if>
+            <if test="accountId != null">
+                account_id = #{accountId} ,
+            </if>
+            <if test="strategyType != null and strategyType != ''">
+                strategy_type = #{strategyType} ,
+            </if>
+            <if test="profit != null">
+                profit = #{profit} ,
+            </if>
+            <if test="displayTime != null">
+                display_time = #{displayTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 根据主键物理删除 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from ,quant_strategy_profit where id = #{id}
+    </delete>
+
+    <!-- 可分页的对象查询 -->
+    <select id="findList" resultType="com.slf.quant.facade.entity.strategy.QuantStrategyProfit">
+        SELECT
+        <include refid="quantStrategyProfitColumns"/>
+        FROM ,quant_strategy_profit a
+        WHERE 1=1
+        <if test="strategyId != null">
+            and a.strategy_id = #{strategyId}
+        </if>
+        <if test="accountId != null">
+            and a.account_id = #{accountId}
+        </if>
+        <if test="strategyType != null and strategyType != ''">
+            and a.strategy_type = #{strategyType}
+        </if>
+        order by a.display_time desc
+    </select>
+
+    <select id="selectAll" resultType="com.slf.quant.facade.entity.strategy.QuantStrategyProfit">
+        SELECT
+        <include refid="quantStrategyProfitColumns"/>
+        FROM ,quant_strategy_profit a
+    </select>
+
+
+    <select id="findRank" resultType="com.slf.quant.facade.entity.strategy.QuantStrategyProfit">
+        select
+        <include refid="quantStrategyProfitJoinColumns"/>
+        from quant_strategy_profit a
+       left join t_user b
+                 on a.account_id = b.user_id
+        where a.display_time in (select max(display_time) from quant_strategy_profit group by strategy_id)
+        <if test="displayTime != null">
+            and a.display_time >= #{displayTime}
+        </if>
+        order by a.profit desc
+    </select>
+
+    <select id="findTodayFirstStats" resultType="com.slf.quant.facade.entity.strategy.QuantStrategyProfit">
+        select
+        <include refid="quantStrategyProfitJoinColumns"/>
+        from quant_strategy_profit a
+        left join t_user b
+        on a.account_id = b.user_id
+        where a.display_time in (select min(display_time) from quant_strategy_profit where display_time>= #{displayTime} group by strategy_id)
+    </select>
+
+</mapper>

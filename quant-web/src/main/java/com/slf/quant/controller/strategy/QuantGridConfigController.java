@@ -1,12 +1,9 @@
 package com.slf.quant.controller.strategy;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpSession;
 
 import com.slf.quant.config.BaseController;
 import com.slf.quant.domain.SuccessCode;
@@ -15,10 +12,10 @@ import com.slf.quant.facade.bean.Pagination;
 import com.slf.quant.facade.consts.KeyConst;
 
 import com.slf.quant.facade.entity.strategy.QuantGridConfig;
-import com.slf.quant.facade.entity.strategy.QuantGridProfit;
+import com.slf.quant.facade.entity.strategy.QuantStrategyProfit;
 import com.slf.quant.facade.model.StrategyStatusModel;
 import com.slf.quant.facade.service.strategy.QuantGridConfigService;
-import com.slf.quant.facade.service.strategy.QuantGridProfitService;
+import com.slf.quant.facade.service.strategy.QuantStrategyProfitService;
 import com.slf.quant.strategy.consts.TradeConst;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -43,7 +40,7 @@ public class QuantGridConfigController extends BaseController
     private QuantGridConfigService quantGridConfigService;
     
     @Autowired(required = false)
-    private QuantGridProfitService quantGridProfitService;
+    private QuantStrategyProfitService quantStrategyProfitService;
     
     /**
      * 查询所有
@@ -86,13 +83,13 @@ public class QuantGridConfigController extends BaseController
         map.put("data", list);
         map.put("code", 200);
         // 折线图数据
-        QuantGridProfit param = new QuantGridProfit();
+        QuantStrategyProfit param = new QuantStrategyProfit();
         param.setStrategyId(id);
-        List<QuantGridProfit> profits = quantGridProfitService.findList(param);
-        QuantGridProfit p1 = new QuantGridProfit();
+        List<QuantStrategyProfit> profits = quantStrategyProfitService.findList(param);
+        QuantStrategyProfit p1 = new QuantStrategyProfit();
         p1.setDisplayTime(1L);
         p1.setProfit(BigDecimal.valueOf(3));
-        QuantGridProfit p2 = new QuantGridProfit();
+        QuantStrategyProfit p2 = new QuantStrategyProfit();
         p2.setDisplayTime(2L);
         p2.setProfit(BigDecimal.valueOf(1));
         profits.add(p1);

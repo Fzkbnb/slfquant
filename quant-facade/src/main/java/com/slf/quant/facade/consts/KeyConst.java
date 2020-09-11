@@ -16,7 +16,7 @@ public class KeyConst
     
     public static final String STRATEGYTYPE_HEDGE         = "Hedge";
     
-    public static final String STRATEGYTYPE_AVG           = "Avg";
+    public static final String STRATEGYTYPE_AVG           = "avg";
     
     public static final String STRATEGYTYPE_HEDGEUSDT     = "HedgeUsdt";
     

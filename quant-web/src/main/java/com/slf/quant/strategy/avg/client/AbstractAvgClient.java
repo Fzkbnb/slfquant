@@ -2,10 +2,15 @@ package com.slf.quant.strategy.avg.client;
 
 import java.math.BigDecimal;
 
+import com.slf.quant.facade.consts.KeyConst;
 import com.slf.quant.facade.entity.strategy.QuantAvgConfig;
+import com.slf.quant.facade.entity.strategy.QuantStrategyProfit;
+
 import com.slf.quant.facade.model.QuoteDepth;
 import com.slf.quant.facade.model.SpotOrder;
+
 import com.slf.quant.facade.service.strategy.QuantAvgConfigService;
+import com.slf.quant.facade.service.strategy.QuantStrategyProfitService;
 import com.slf.quant.facade.utils.SpringContext;
 import com.slf.quant.strategy.consts.TradeConst;
 import lombok.Data;
@@ -15,45 +20,49 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractAvgClient
 {
-    protected QuantAvgConfigService quantAvgConfigService = SpringContext.getBean("quantAvgConfigServiceImpl");
+    protected QuantStrategyProfitService quantStrategyProfitService = SpringContext.getBean("quantStrategyProfitServiceImpl");
     
-    protected QuantAvgConfig        config;
+    protected QuantAvgConfigService      quantAvgConfigService      = SpringContext.getBean("quantAvgConfigServiceImpl");
     
-    protected String                apiKey;
+    protected QuantAvgConfig             config;
     
-    protected String                secretKey;
+    protected String                     apiKey;
     
-    protected String                passPhrase;
+    protected String                     secretKey;
     
-    protected String                idStr;
+    protected String                     passPhrase;
     
-    protected String                exchangeAccount;
+    protected String                     idStr;
     
-    protected int                   pricePrecision;
+    protected String                     exchangeAccount;
     
-    protected int                   amtPrecision;
+    protected int                        pricePrecision;
     
-    protected boolean               hasError;
+    protected int                        amtPrecision;
     
-    protected long                  orderId               = 0;
+    protected boolean                    hasError;
     
-    protected boolean               isStoped              = false;
+    protected long                       orderId                    = 0;
     
-    protected boolean               stopFlag              = false;
+    protected boolean                    isStoped                   = false;
     
-    protected long                  firstStopTime         = 0;
+    protected boolean                    stopFlag                   = false;
     
-    protected long                  lastCacheTime         = 0;
+    protected long                       firstStopTime              = 0;
     
-    protected QuoteDepth            currentDepthModel;
+    protected long                       lastCacheTime              = 0;
     
-    protected BigDecimal            tickSize;
+    protected long                       lastSaveProfitTime         = 0;
     
-    protected BigDecimal            minSpotAmt;
+    protected QuoteDepth                 currentDepthModel;
     
-    private String                  direct;
+    protected BigDecimal                 tickSize;
     
-    protected BigDecimal            feeRate;
+    protected BigDecimal                 minSpotAmt;
+    
+    private String                       direct;
+    
+    protected BigDecimal                 feeRate;
     
     public AbstractAvgClient(QuantAvgConfig config, String apiKey, String secretKey, String passPhrase)
     {
@@ -92,7 +101,7 @@ public abstract class AbstractAvgClient
             {
                 try
                 {
-                    // cacheSumInfo();
+                    cacheStatsInfo();
                     if (checkNeedStop())
                     {
                         break;
@@ -154,6 +163,34 @@ public abstract class AbstractAvgClient
             // 停止策略
             stop();
         }).start();
+    }
+    
+    // 保存统计信息
+    private void cacheStatsInfo()
+    {
+        // 每隔10秒监控一次
+        long curtime = System.currentTimeMillis();
+        if (curtime - lastCacheTime > 10000)
+        {
+            if (null == currentDepthModel)
+            { return; }
+            lastCacheTime = System.currentTimeMillis();
+            BigDecimal profit = config.getUsdtBalance().add(config.getCoinBalance().multiply(currentDepthModel.getBid()).subtract(config.getUsdtCapital())).setScale(2,
+                    BigDecimal.ROUND_DOWN);
+            // 每隔一小时保存一次盈亏统计信息到数据库用于绘制折线图
+            if (curtime - lastSaveProfitTime > 60000L * 60)
+            {
+                long displayTime = curtime - curtime % (60000 * 60);
+                QuantStrategyProfit quantStrategyProfit = new QuantStrategyProfit();
+                quantStrategyProfit.setStrategyId(config.getId());
+                quantStrategyProfit.setAccountId(config.getAccountId());
+                quantStrategyProfit.setStrategyType(KeyConst.STRATEGYTYPE_AVG);
+                quantStrategyProfit.setDisplayTime(displayTime);
+                quantStrategyProfit.setProfit(profit);
+                quantStrategyProfitService.insert(quantStrategyProfit);
+                lastSaveProfitTime = displayTime;
+            }
+        }
     }
     
     private void handleSpotOrder(SpotOrder spotOrder)

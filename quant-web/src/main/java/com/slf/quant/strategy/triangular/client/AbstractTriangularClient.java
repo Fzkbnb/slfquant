@@ -98,7 +98,7 @@ public class AbstractTriangularClient
                                 continue;
                             }
                             BigDecimal discountRate = new BigDecimal("0.9985");
-                            // 计算正向溢价,默认按10美金进行买入
+                            // 计算溢价,默认按10美金进行交易
                             // (1)btc市场正向
                             BigDecimal profit1 = BigDecimal.TEN.divide(depth1.getAsk(), 8, BigDecimal.ROUND_DOWN).multiply(discountRate).multiply(depth2.getBid())
                                     .multiply(discountRate).multiply(depth4.getBid()).multiply(discountRate).subtract(BigDecimal.TEN).setScale(8, BigDecimal.ROUND_DOWN);
@@ -115,7 +115,7 @@ public class AbstractTriangularClient
                                     .subtract(BigDecimal.TEN).setScale(8, BigDecimal.ROUND_DOWN);
                             maxProfit = ObjectUtils.max(maxProfit, profit1, profit2, profit3, profit4);
                         }
-//                        log.info("本次行情监控阶段发现最高溢价为{}USDT!", maxProfit);
+                         log.info("本次行情监控阶段发现最高溢价为{}USDT!", maxProfit);
                         if (maxProfit.compareTo(BigDecimal.ONE) == 1)
                         {
                             log.info("监控发现最佳溢价：{}", maxProfit);

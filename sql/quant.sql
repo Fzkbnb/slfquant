@@ -2746,13 +2746,15 @@ CREATE TABLE `quant_avg_config`
 delete  from `t_role_menu` where menu_id in(10,20,30,40,50);
 
 
-DROP TABLE IF EXISTS `quant_grid_profit`;
-CREATE TABLE `quant_grid_profit`
+DROP TABLE IF EXISTS `quant_strategy_profit`;
+CREATE TABLE `quant_strategy_profit`
 (
   `id`           bigint COMMENT 'ID',
+  `account_id`  bigint         NOT NULL COMMENT '账户id',
   `strategy_id`  bigint         NOT NULL COMMENT '策略id',
   `display_time` bigint         NOT NULL COMMENT '展示时间',
   `profit`       decimal(16, 8) NOT NULL COMMENT '盈利',
+  `strategy_type` varchar(255)   NOT NULL COMMENT '策略类型',
   PRIMARY KEY (`id`)
-) ROW_FORMAT = COMPACT COMMENT ='网格策略收益统计表';s
+) ROW_FORMAT = COMPACT COMMENT ='策略收益统计表';
 

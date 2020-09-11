@@ -25,11 +25,17 @@ import lombok.Data;
  * @author fzk
  **/
 @Data
-public class QuantGridProfit extends BaseEntity
+public class QuantStrategyProfit extends BaseEntity
 {
     private Long       strategyId;  // 策略id
+    
+    private Long       accountId;   // 账户id
     
     private BigDecimal profit;      // 盈亏
     
     private Long       displayTime; // 更新时间
+    
+    private String     strategyType;// 策略类型
+    
+    private String     userName;    // 账户名
 }

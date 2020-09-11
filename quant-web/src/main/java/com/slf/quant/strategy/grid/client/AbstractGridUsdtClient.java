@@ -5,16 +5,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.slf.quant.facade.consts.KeyConst;
 import com.slf.quant.facade.entity.strategy.QuantGridConfig;
-import com.slf.quant.facade.entity.strategy.QuantGridProfit;
+import com.slf.quant.facade.entity.strategy.QuantStrategyProfit;
 import com.slf.quant.facade.entity.strategy.QuantGridStats;
 import com.slf.quant.facade.model.*;
 import com.slf.quant.facade.service.strategy.QuantGridConfigService;
-import com.slf.quant.facade.service.strategy.QuantGridProfitService;
+import com.slf.quant.facade.service.strategy.QuantStrategyProfitService;
 import com.slf.quant.facade.service.strategy.QuantGridStatsService;
 import com.slf.quant.facade.utils.SpringContext;
 import org.apache.commons.lang3.ObjectUtils;
@@ -29,65 +27,65 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractGridUsdtClient
 {
-    protected QuantGridStatsService  quantGridStatsService  = SpringContext.getBean("quantGridStatsServiceImpl");
+    protected QuantGridStatsService      quantGridStatsService      = SpringContext.getBean("quantGridStatsServiceImpl");
     
-    protected QuantGridConfigService quantGridConfigService = SpringContext.getBean("quantGridConfigServiceImpl");
+    protected QuantGridConfigService     quantGridConfigService     = SpringContext.getBean("quantGridConfigServiceImpl");
     
-    protected QuantGridProfitService quantGridProfitService = SpringContext.getBean("quantGridProfitServiceImpl");
+    protected QuantStrategyProfitService quantStrategyProfitService = SpringContext.getBean("quantStrategyProfitServiceImpl");
     
-    protected QuantGridConfig        config;
+    protected QuantGridConfig            config;
     
-    protected List<QuantGridStats>   orders                 = new ArrayList<>();
+    protected List<QuantGridStats>       orders                     = new ArrayList<>();
     
-    protected String                 apiKey;
+    protected String                     apiKey;
     
-    protected String                 secretKey;
+    protected String                     secretKey;
     
-    protected String                 passPhrase;
+    protected String                     passPhrase;
     
-    protected String                 idStr;
+    protected String                     idStr;
     
-    protected String                 contractCode;
+    protected String                     contractCode;
     
-    protected String                 exchangeAccount;
+    protected String                     exchangeAccount;
     
-    protected int                    pricePrecision;
+    protected int                        pricePrecision;
     
-    protected boolean                hasError;
+    protected boolean                    hasError;
     
-    protected long                   orderId                = 0;
+    protected long                       orderId                    = 0;
     
-    protected Integer                fixNum;
+    protected Integer                    fixNum;
     
-    protected boolean                isStoped               = false;
+    protected boolean                    isStoped                   = false;
     
-    protected boolean                stopFlag               = false;
+    protected boolean                    stopFlag                   = false;
     
-    protected BigDecimal             spotFeeRate_taker;
+    protected BigDecimal                 spotFeeRate_taker;
     
-    protected BigDecimal             spotFeeRate_cal;
+    protected BigDecimal                 spotFeeRate_cal;
     
-    protected BigDecimal             spotFeeRate_maker;
+    protected BigDecimal                 spotFeeRate_maker;
     
-    protected String                 spotFeeRate_taker_str;
+    protected String                     spotFeeRate_taker_str;
     
-    protected String                 spotFeeRate_maker_str;
+    protected String                     spotFeeRate_maker_str;
     
-    protected long                   firstStopTime          = 0;
+    protected long                       firstStopTime              = 0;
     
-    protected long                   lastCacheTime          = 0;
+    protected long                       lastCacheTime              = 0;
     
-    protected long                   lastSaveProfitTime     = 0;
+    protected long                       lastSaveProfitTime         = 0;
     
-    protected QuoteDepth             currentDepthModel;
+    protected QuoteDepth                 currentDepthModel;
     
-    protected BigDecimal             startSellPrice;
+    protected BigDecimal                 startSellPrice;
     
-    protected BigDecimal             startBuyPrice;
+    protected BigDecimal                 startBuyPrice;
     
-    protected BigDecimal             tickSize;
+    protected BigDecimal                 tickSize;
     
-    protected BigDecimal             contractPerValue;
+    protected BigDecimal                 contractPerValue;
     
     public AbstractGridUsdtClient(QuantGridConfig config, String apiKey, String secretKey, String passPhrase)
     {
@@ -234,11 +232,13 @@ public abstract class AbstractGridUsdtClient
             if (curtime - lastSaveProfitTime > 60000L * 60)
             {
                 long displayTime = curtime - curtime % (60000 * 60);
-                QuantGridProfit quantGridProfit = new QuantGridProfit();
-                quantGridProfit.setStrategyId(config.getId());
-                quantGridProfit.setDisplayTime(displayTime);
-                quantGridProfit.setProfit(model.getProfit().add(model.getProfitUnreal()).setScale(2, BigDecimal.ROUND_DOWN));
-                quantGridProfitService.insert(quantGridProfit);
+                QuantStrategyProfit quantStrategyProfit = new QuantStrategyProfit();
+                quantStrategyProfit.setStrategyId(config.getId());
+                quantStrategyProfit.setAccountId(config.getAccountId());
+                quantStrategyProfit.setStrategyType(KeyConst.STRATEGYTYPE_GRID);
+                quantStrategyProfit.setDisplayTime(displayTime);
+                quantStrategyProfit.setProfit(model.getProfit().add(model.getProfitUnreal()).setScale(2, BigDecimal.ROUND_DOWN));
+                quantStrategyProfitService.insert(quantStrategyProfit);
                 lastSaveProfitTime = displayTime;
             }
         }
