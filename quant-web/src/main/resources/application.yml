@@ -23,9 +23,9 @@ spring:
     username: fzk
     password: fzk123
       # 初始连接数
-    initial-size: 5
+    initial-size: 4
       # 最小连接数
-    min-idle: 10
+    min-idle: 4
       # 最大连接数
     max-active: 20
       # 获取连接超时时间

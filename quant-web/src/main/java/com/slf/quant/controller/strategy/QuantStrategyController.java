@@ -34,8 +34,6 @@ import sun.util.calendar.CalendarUtils;
 @RequestMapping("/strategy/index")
 public class QuantStrategyController extends BaseController
 {
-    @Autowired(required = false)
-    private QuantApiConfigService      quantApiConfigService;
     
     @Autowired(required = false)
     private QuantStrategyProfitService quantStrategyProfitService;
@@ -73,6 +71,13 @@ public class QuantStrategyController extends BaseController
         map.put("hisRank", hislist);
         map.put("code", 200);
         return map;
+    }
+
+    @PostMapping("/stats")
+    public Map<String, Object> stats(Long id)
+    {
+        return quantStrategyProfitService.getProfitStats(id);
+
     }
     
 

@@ -8,10 +8,15 @@ import com.slf.quant.facade.bean.BaseService;
 import com.slf.quant.facade.entity.strategy.QuantStrategyProfit;
 
 import java.util.List;
+import java.util.Map;
 
 public interface QuantStrategyProfitService extends BaseService<QuantStrategyProfit>
 {
     List<QuantStrategyProfit> findRank(Long minTime);
 
     List<QuantStrategyProfit> findTodayFirstStats(Long currentDateFirstSec);
+
+    QuantStrategyProfit findLastProfit(Long id);
+
+    Map<String, Object> getProfitStats(Long id);
 }

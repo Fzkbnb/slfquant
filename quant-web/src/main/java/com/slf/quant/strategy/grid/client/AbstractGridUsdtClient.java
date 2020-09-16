@@ -226,7 +226,7 @@ public abstract class AbstractGridUsdtClient
             models.add(m2);
             models.add(m3);
             models.add(m4);
-            TradeConst.grid_stats_map.put(KeyConst.REDISKEY_GRID_STATUS + config.getId(), models);
+            TradeConst.strategy_stats_map.put(KeyConst.REDISKEY_STRATEGY_STATS + config.getId(), models);
             // redisUtils.set(KeyConst.REDISKEY_GRID_STATUS + config.getId(), models);
             // 每隔一小时保存一次盈亏统计信息到数据库用于绘制折线图
             if (curtime - lastSaveProfitTime > 60000L * 60)

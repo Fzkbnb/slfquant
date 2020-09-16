@@ -86,7 +86,7 @@
     <select id="findList" resultType="com.slf.quant.facade.entity.strategy.QuantStrategyProfit">
         SELECT
         <include refid="quantStrategyProfitColumns"/>
-        FROM ,quant_strategy_profit a
+        FROM quant_strategy_profit a
         WHERE 1=1
         <if test="strategyId != null">
             and a.strategy_id = #{strategyId}
@@ -97,7 +97,7 @@
         <if test="strategyType != null and strategyType != ''">
             and a.strategy_type = #{strategyType}
         </if>
-        order by a.display_time desc
+        order by a.display_time
     </select>
 
     <select id="selectAll" resultType="com.slf.quant.facade.entity.strategy.QuantStrategyProfit">
@@ -111,8 +111,8 @@
         select
         <include refid="quantStrategyProfitJoinColumns"/>
         from quant_strategy_profit a
-       left join t_user b
-                 on a.account_id = b.user_id
+        left join t_user b
+        on a.account_id = b.user_id
         where a.display_time in (select max(display_time) from quant_strategy_profit group by strategy_id)
         <if test="displayTime != null">
             and a.display_time >= #{displayTime}
@@ -126,7 +126,14 @@
         from quant_strategy_profit a
         left join t_user b
         on a.account_id = b.user_id
-        where a.display_time in (select min(display_time) from quant_strategy_profit where display_time>= #{displayTime} group by strategy_id)
+        where a.display_time in (select min(display_time) from quant_strategy_profit where display_time>= #{displayTime}
+        group by strategy_id)
     </select>
 
+    <select id="findLastProfit" resultType="com.slf.quant.facade.entity.strategy.QuantStrategyProfit">
+        select
+        <include refid="quantStrategyProfitColumns"/>
+        from quant_strategy_profit a where a.strategy_id=#{strategyId} and a.display_time = (select max(display_time)
+        from quant_strategy_profit where strategy_id=#{strategyId})
+    </select>
 </mapper>

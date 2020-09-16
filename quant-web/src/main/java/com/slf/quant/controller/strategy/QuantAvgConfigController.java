@@ -2,8 +2,15 @@ package com.slf.quant.controller.strategy;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.slf.quant.facade.consts.KeyConst;
+import com.slf.quant.facade.entity.strategy.QuantStrategyProfit;
+import com.slf.quant.facade.model.StrategyStatusModel;
+import com.slf.quant.facade.service.strategy.QuantStrategyProfitService;
+import com.slf.quant.strategy.consts.TradeConst;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +35,8 @@ public class QuantAvgConfigController extends BaseController
 {
     @Autowired(required = false)
     private QuantAvgConfigService quantAvgConfigService;
-    
+    @Autowired(required = false)
+    private QuantStrategyProfitService quantStrategyProfitService;
     /**
      * 查询所有
      * @return

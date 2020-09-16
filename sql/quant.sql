@@ -2745,7 +2745,7 @@ CREATE TABLE `quant_avg_config`
 --移除模版多余的菜单
 delete  from `t_role_menu` where menu_id in(10,20,30,40,50);
 
-
+--200911
 DROP TABLE IF EXISTS `quant_strategy_profit`;
 CREATE TABLE `quant_strategy_profit`
 (

@@ -1,6 +1,8 @@
 package com.slf.quant.strategy.avg.client;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.slf.quant.facade.consts.KeyConst;
 import com.slf.quant.facade.entity.strategy.QuantAvgConfig;
@@ -9,6 +11,7 @@ import com.slf.quant.facade.entity.strategy.QuantStrategyProfit;
 import com.slf.quant.facade.model.QuoteDepth;
 import com.slf.quant.facade.model.SpotOrder;
 
+import com.slf.quant.facade.model.StrategyStatusModel;
 import com.slf.quant.facade.service.strategy.QuantAvgConfigService;
 import com.slf.quant.facade.service.strategy.QuantStrategyProfitService;
 import com.slf.quant.facade.utils.SpringContext;
@@ -175,9 +178,24 @@ public abstract class AbstractAvgClient
             if (null == currentDepthModel)
             { return; }
             lastCacheTime = System.currentTimeMillis();
-            BigDecimal profit = config.getUsdtBalance().add(config.getCoinBalance().multiply(currentDepthModel.getBid()).subtract(config.getUsdtCapital())).setScale(2,
-                    BigDecimal.ROUND_DOWN);
-            // 每隔一小时保存一次盈亏统计信息到数据库用于绘制折线图
+            BigDecimal currentBalance = config.getUsdtBalance().add(config.getCoinBalance().multiply(currentDepthModel.getBid()));
+            BigDecimal profit = currentBalance.subtract(config.getUsdtCapital()).setScale(2, BigDecimal.ROUND_DOWN);
+            List<StrategyStatusModel> models = new ArrayList<>();
+            StrategyStatusModel m1 = new StrategyStatusModel();
+            m1.setKey("初始行情价/当前行情价");
+            m1.setValue(config.getFirstBasePrice().setScale(pricePrecision, BigDecimal.ROUND_HALF_UP) + "/"
+                    + currentDepthModel.getBid().setScale(pricePrecision, BigDecimal.ROUND_HALF_UP));
+            StrategyStatusModel m2 = new StrategyStatusModel();
+            m2.setKey("初始本金/当前本金(USDT)");
+            m2.setValue(config.getUsdtCapital().setScale(2, BigDecimal.ROUND_DOWN) + "/" + currentBalance.setScale(2, BigDecimal.ROUND_DOWN));
+            StrategyStatusModel m3 = new StrategyStatusModel();
+            m3.setKey("交易次数/盈利率");
+            m3.setValue(config.getTradeCount() + "/" + profit.divide(config.getUsdtCapital(), 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100)) + "%");
+            models.add(m1);
+            models.add(m2);
+            models.add(m3);
+            TradeConst.strategy_stats_map.put(KeyConst.REDISKEY_STRATEGY_STATS + config.getId(), models);
+            // 每隔一小时新建一次盈亏统计信息到数据库用于绘制折线图
             if (curtime - lastSaveProfitTime > 60000L * 60)
             {
                 long displayTime = curtime - curtime % (60000 * 60);
@@ -298,6 +316,14 @@ public abstract class AbstractAvgClient
     
     private void initCommentData()
     {
+        if (lastSaveProfitTime == 0)
+        {
+            QuantStrategyProfit lastProfit = quantStrategyProfitService.findLastProfit(config.getId());
+            if (null != lastProfit)
+            {
+                lastSaveProfitTime = lastProfit.getDisplayTime();
+            }
+        }
     }
     
     private boolean checkNeedStop()

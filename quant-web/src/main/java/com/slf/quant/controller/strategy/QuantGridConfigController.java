@@ -64,39 +64,7 @@ public class QuantGridConfigController extends BaseController
         return map;
     }
     
-    @PostMapping("/stats")
-    public Map<String, Object> stats(Long id)
-    {
-        String key = KeyConst.REDISKEY_GRID_STATUS + id;
-        Map<String, Object> map = new HashMap<>();
-        List<StrategyStatusModel> list = TradeConst.grid_stats_map.get(key);
-        if (CollectionUtils.isNotEmpty(list))
-        {
-            map.put("data", list);
-            map.put("code", 200);
-        }
-        else
-        {
-            map.put("message", "统计信息不存在！");
-            map.put("code", -1);
-        }
-        map.put("data", list);
-        map.put("code", 200);
-        // 折线图数据
-        QuantStrategyProfit param = new QuantStrategyProfit();
-        param.setStrategyId(id);
-        List<QuantStrategyProfit> profits = quantStrategyProfitService.findList(param);
-        QuantStrategyProfit p1 = new QuantStrategyProfit();
-        p1.setDisplayTime(1L);
-        p1.setProfit(BigDecimal.valueOf(3));
-        QuantStrategyProfit p2 = new QuantStrategyProfit();
-        p2.setDisplayTime(2L);
-        p2.setProfit(BigDecimal.valueOf(1));
-        profits.add(p1);
-        profits.add(p2);
-        map.put("profits", profits);
-        return map;
-    }
+
     
     /**
      * 添加或修改

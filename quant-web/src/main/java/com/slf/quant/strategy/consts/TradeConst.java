@@ -39,5 +39,5 @@ public class TradeConst
     
     public static String                                 triangular_currencys      = "XEM,NAS,ZEN,CTXC,GTO,TRIO,TRB,WTC,DASH,NANO,WAVES,XRP,TRX,MDT,ZRX,AE,IOST,DOT,OMG,TRUE,JST,NULS,BAND,CMT,RSR,IOTA,CVC,MITH,GAS,LTC,BTM,KCASH,BTT,CRV,LEND,ALGO,INT,ATOM,SC,ORS,HYC,ABT,ONT,XLM,LINK,YFI,QTUM,KSM,MANA,MOF,OKB,EOS,SWFTC,EGT,ETC,MKR,MCO,ZEC,NEO,REN,HC,ZIL,LRC,XMR,ADA,YOU,ELF";
     
-    public static Map<String, List<StrategyStatusModel>> grid_stats_map            = new ConcurrentHashMap<>();
+    public static Map<String, List<StrategyStatusModel>> strategy_stats_map            = new ConcurrentHashMap<>();
 }

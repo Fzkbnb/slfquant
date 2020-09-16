@@ -18,4 +18,6 @@ public interface QuantStrategyProfitMapper extends BaseMapper<QuantStrategyProfi
     List<QuantStrategyProfit> findRank(@Param("displayTime") Long displayTime);
     
     List<QuantStrategyProfit> findTodayFirstStats(@Param("displayTime") Long displayTime);
+    
+    QuantStrategyProfit findLastProfit(@Param("strategyId") Long strategyId);
 }

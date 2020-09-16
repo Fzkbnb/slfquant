@@ -71,25 +71,25 @@ public class QuoteAnalysisTask
                     // log.info(">>>排序结束<<<");
                     // 2.okex u本位
                     List<PremiumRatioModel> setsU = new ArrayList<>();
-                    // for (String currency : currencys)
-                    // {
-                    // QuoteDepth cwQuoteDepth = getOkexContractPrice(currency + "-USDT-" + cw);
-                    // QuoteDepth nwQuoteDepth = getOkexContractPrice(currency + "-USDT-" + nw);
-                    // QuoteDepth cqQuoteDepth = getOkexContractPrice(currency + "-USDT-" + cq);
-                    // QuoteDepth nqQuoteDepth = getOkexContractPrice(currency + "-USDT-" + nq);
-                    // if (null != cwQuoteDepth && null != nwQuoteDepth && null != cqQuoteDepth && null != nqQuoteDepth)
-                    // {
-                    // QuoteDepth maxQuoteDepth = ObjectUtils.max(cwQuoteDepth, nwQuoteDepth, cqQuoteDepth, nqQuoteDepth);
-                    // QuoteDepth minQuoteDepth = ObjectUtils.min(cwQuoteDepth, nwQuoteDepth, cqQuoteDepth, nqQuoteDepth);
-                    // PremiumRatioModel premiumRatioModel = PremiumRatioModel.builder().longQuoteDepth(minQuoteDepth).shortQuoteDepth(maxQuoteDepth)
-                    // .ratio(maxQuoteDepth.getBid().subtract(minQuoteDepth.getAsk()).divide(minQuoteDepth.getAsk(), 4, BigDecimal.ROUND_HALF_UP)).build();
-                    // setsU.add(premiumRatioModel);
-                    // }
-                    // else
-                    // {
-                    // log.info("{}行情缓存不存在或超时，本次取消当前币种溢价率统计！", currency);
-                    // }
-                    // }
+                     for (String currency : currencys)
+                     {
+                     QuoteDepth cwQuoteDepth = getOkexContractPrice(currency + "-USDT-" + cw);
+                     QuoteDepth nwQuoteDepth = getOkexContractPrice(currency + "-USDT-" + nw);
+                     QuoteDepth cqQuoteDepth = getOkexContractPrice(currency + "-USDT-" + cq);
+                     QuoteDepth nqQuoteDepth = getOkexContractPrice(currency + "-USDT-" + nq);
+                     if (null != cwQuoteDepth && null != nwQuoteDepth && null != cqQuoteDepth && null != nqQuoteDepth)
+                     {
+                     QuoteDepth maxQuoteDepth = ObjectUtils.max(cwQuoteDepth, nwQuoteDepth, cqQuoteDepth, nqQuoteDepth);
+                     QuoteDepth minQuoteDepth = ObjectUtils.min(cwQuoteDepth, nwQuoteDepth, cqQuoteDepth, nqQuoteDepth);
+                     PremiumRatioModel premiumRatioModel = PremiumRatioModel.builder().longQuoteDepth(minQuoteDepth).shortQuoteDepth(maxQuoteDepth)
+                     .ratio(maxQuoteDepth.getBid().subtract(minQuoteDepth.getAsk()).divide(minQuoteDepth.getAsk(), 4, BigDecimal.ROUND_HALF_UP)).build();
+                     setsU.add(premiumRatioModel);
+                     }
+                     else
+                     {
+                     log.info("{}行情缓存不存在或超时，本次取消当前币种溢价率统计！", currency);
+                     }
+                     }
                     for (String currency : currencys)
                     {
                         QuoteDepth nwQuoteDepth = getOkexContractPrice(currency + "-USDT-" + nw);

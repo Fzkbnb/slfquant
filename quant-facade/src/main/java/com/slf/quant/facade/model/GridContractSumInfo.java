@@ -21,7 +21,7 @@ public class GridContractSumInfo implements Serializable
     
     private BigDecimal sumSellBal;
     
-    private Long       monitorTime;   // 统计时间
+    private Long       monitorTime;                   // 统计时间
     
     private BigDecimal avgSellPrice;
     
@@ -31,9 +31,9 @@ public class GridContractSumInfo implements Serializable
     
     private BigDecimal startBuyPrice;
     
-    private BigDecimal profit;
+    private BigDecimal profit       = BigDecimal.ZERO;
     
-    private BigDecimal profitReal;
+    private BigDecimal profitReal   = BigDecimal.ZERO;
     
-    private BigDecimal profitUnreal;
+    private BigDecimal profitUnreal = BigDecimal.ZERO;
 }
