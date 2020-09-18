@@ -113,7 +113,7 @@
         from quant_strategy_profit a
         left join t_user b
         on a.account_id = b.user_id
-        where a.display_time in (select max(display_time) from quant_strategy_profit group by strategy_id)
+        where a.display_time in (select max(display_time) from quant_strategy_profit)
         <if test="displayTime != null">
             and a.display_time >= #{displayTime}
         </if>

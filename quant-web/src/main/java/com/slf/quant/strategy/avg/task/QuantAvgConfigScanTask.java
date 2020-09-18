@@ -122,7 +122,6 @@ public class QuantAvgConfigScanTask
     
     private void stop(Long id)
     {
-        quantAvgConfigService.changeStatus(id, 4);
         AbstractAvgClient client = TradeConst.avg_running_map.get(id);
         if (null != client)
         {// 已发出停止指令则不需要重复停

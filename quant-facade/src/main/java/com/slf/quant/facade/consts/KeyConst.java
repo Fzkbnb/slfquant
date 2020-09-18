@@ -8,9 +8,9 @@ public class KeyConst
 
     public static String       quote_currencys            = "BTC,ETH,EOS,LTC,BCH,XRP,BSV,ETC,TRX";
     
-    public static final String EXCHANGE_OKEX              = "OKEx";
+    public static final String EXCHANGE_OKEX              = "okex";
     
-    public static final String EXCHANGE_HUOBI             = "Huobi";
+    public static final String EXCHANGE_HUOBI             = "huobi";
     
     public static final String STRATEGYTYPE_PLADDPOSITION = "PLAddPos";
     

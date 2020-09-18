@@ -1,19 +1,25 @@
 package com.slf.quant.strategy.grid.quote;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import com.slf.quant.facade.consts.KeyConst;
+import com.slf.quant.facade.entity.strategy.QuantQuoteChange;
 import com.slf.quant.facade.model.OkexMarketModel;
 import com.slf.quant.facade.model.QuoteDepth;
+import com.slf.quant.facade.sdk.okex.bean.spot.result.Trade;
+import com.slf.quant.facade.service.strategy.QuantQuoteChangeService;
+import com.slf.quant.facade.utils.DateUtils;
 import com.slf.quant.facade.utils.QuantUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.slf.quant.strategy.consts.TradeConst;
-
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.WebSocket;
@@ -22,11 +28,14 @@ import okhttp3.WebSocket;
 @Service
 public class OkexUsdtMarketListener extends AbstractMarketListener
 {
-    private static String DEPTH_SPOT     = "\"spot/depth5:%s\"";
+    private static String           DEPTH_SPOT     = "\"spot/depth5:%s\"";
     
-    private static String DEPTH_CONTRACT = "\"futures/depth5:%s\"";
+    private static String           DEPTH_CONTRACT = "\"futures/depth5:%s\"";
     
-    private static String DEPTH_SWAP     = "\"swap/depth5:%s\"";
+    private static String           DEPTH_SWAP     = "\"swap/depth5:%s\"";
+    
+    @Autowired
+    private QuantQuoteChangeService quantQuoteChangeService;
     
     @Override
     protected void subscribe(WebSocket ws)
@@ -108,6 +117,7 @@ public class OkexUsdtMarketListener extends AbstractMarketListener
                 quoteDepthModel.buildAskBid();
                 String symbol = quoteDepthModel.getInstrument_id();
                 TradeConst.okex_depth_map.put(symbol, quoteDepthModel);
+                handleChangeRateData(symbol, quoteDepthModel, new BigDecimal("0.0015"));
             }
             else
             {
@@ -118,6 +128,69 @@ public class OkexUsdtMarketListener extends AbstractMarketListener
         {
             log.info("okex行情websocket客户端onmessage处理异常：{}", e.getLocalizedMessage());
             e.printStackTrace();
+        }
+    }
+    
+    private void handleChangeRateData(String symbol, QuoteDepth quoteDepthModel, BigDecimal changeRate)
+    {
+        long firstSec = DateUtils.getCurrentDateFirstSec();
+        String currency = symbol.substring(0, symbol.indexOf("-"));
+        QuantQuoteChange change = TradeConst.okex_change_map.get(currency);
+        if (null == change)
+        {
+            QuantQuoteChange query = new QuantQuoteChange();
+            query.setExchange(KeyConst.EXCHANGE_OKEX);
+            query.setCurrency(currency);
+            query.setStartTime(firstSec);
+            query.setChangeRate(changeRate);
+            List<QuantQuoteChange> list = quantQuoteChangeService.findList(query);
+            if (CollectionUtils.isNotEmpty(list))
+            {
+                change = list.get(0);
+            }
+        }
+        if (null == change)
+        {
+            // 数据库无记录则新建一条
+            change = new QuantQuoteChange();
+            change.setExchange(KeyConst.EXCHANGE_OKEX);
+            change.setCurrency(currency);
+            change.setSymbol(symbol);
+            change.setChangeCount(0);
+            change.setChangeRate(changeRate);
+            change.setStartTime(firstSec);
+            change.setUpdateTime(System.currentTimeMillis());
+            change.setOpenPrice(quoteDepthModel.getAvg());
+            change.setClosePrice(quoteDepthModel.getAvg());
+            change.setBasePrice(quoteDepthModel.getAvg());
+            quantQuoteChangeService.insert(change);
+            TradeConst.okex_change_map.put(currency, change);
+        }
+        // 比较当天第一秒与缓存第一秒，如果大于缓存，则新建一条,否则根据是否波动来更新记录
+        if (firstSec > change.getStartTime())
+        {
+            change.setStartTime(firstSec);
+            change.setChangeCount(0);
+            change.setUpdateTime(System.currentTimeMillis());
+            change.setOpenPrice(quoteDepthModel.getAvg());
+            change.setClosePrice(quoteDepthModel.getAvg());
+            change.setBasePrice(quoteDepthModel.getAvg());
+            quantQuoteChangeService.insert(change);
+            TradeConst.okex_change_map.put(currency, change);
+        }
+        else
+        {
+            BigDecimal lastPrice = quoteDepthModel.getAvg().compareTo(change.getBasePrice())==1?quoteDepthModel.getBid():quoteDepthModel.getAsk();
+            if (lastPrice.subtract(change.getBasePrice()).divide(change.getBasePrice(), 6, BigDecimal.ROUND_HALF_UP).abs().compareTo(changeRate) == 1)
+            {
+                // 触发波动阈值则更新数据库记录
+                change.setChangeCount(change.getChangeCount() + 1);
+                change.setClosePrice(quoteDepthModel.getAvg());
+                change.setBasePrice(quoteDepthModel.getAvg());
+                change.setUpdateTime(System.currentTimeMillis());
+                quantQuoteChangeService.updateByPrimaryKey(change);
+                TradeConst.okex_change_map.put(currency, change);
+            }
         }
     }
     

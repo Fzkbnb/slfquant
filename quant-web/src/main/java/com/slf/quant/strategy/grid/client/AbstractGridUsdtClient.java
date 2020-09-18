@@ -724,6 +724,14 @@ public abstract class AbstractGridUsdtClient
             {
                 Collections.sort(orders, Comparator.comparing(QuantGridStats::getSellPrice).reversed());
             }
+            if (lastSaveProfitTime == 0)
+            {
+                QuantStrategyProfit lastProfit = quantStrategyProfitService.findLastProfit(config.getId());
+                if (null != lastProfit)
+                {
+                    lastSaveProfitTime = lastProfit.getDisplayTime();
+                }
+            }
         }
         catch (Exception e)
         {

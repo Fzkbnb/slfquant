@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.slf.quant.facade.entity.strategy.QuantQuoteChange;
 import com.slf.quant.facade.entity.strategy.QuantStrategyProfit;
+import com.slf.quant.facade.service.strategy.QuantQuoteChangeService;
 import com.slf.quant.facade.service.strategy.QuantStrategyProfitService;
 import com.slf.quant.facade.utils.DateUtils;
 import com.slf.quant.util.DateUtil;
@@ -34,9 +36,11 @@ import sun.util.calendar.CalendarUtils;
 @RequestMapping("/strategy/index")
 public class QuantStrategyController extends BaseController
 {
-    
     @Autowired(required = false)
     private QuantStrategyProfitService quantStrategyProfitService;
+    
+    @Autowired(required = false)
+    private QuantQuoteChangeService    quantQuoteChangeService;
     
     /**
      * 查询收益排名
@@ -50,35 +54,49 @@ public class QuantStrategyController extends BaseController
         // 历史最后一笔统计
         List<QuantStrategyProfit> hislist = quantStrategyProfitService.findRank(null);
         // 当天最后一笔统计
-        List<QuantStrategyProfit> daylist = quantStrategyProfitService.findRank(DateUtils.getCurrentDateFirstSec());
-        // 当天第一笔统计
-        long firstSec = DateUtils.getCurrentDateFirstSec();
-        List<QuantStrategyProfit> firstlist = quantStrategyProfitService.findTodayFirstStats(firstSec);
-        daylist.forEach(stats -> {
-            BigDecimal firstProfit = BigDecimal.ZERO;
-            List<QuantStrategyProfit> matchList = firstlist.stream().filter(l -> l.getStrategyId().equals(stats.getStrategyId())).collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(matchList))
-            {
-                QuantStrategyProfit firstStats = matchList.get(0);
-                if (firstStats.getDisplayTime().equals(firstSec))
-                {
-                    firstProfit = firstStats.getProfit();
-                }
-            }
-            stats.setProfit(stats.getProfit().subtract(firstProfit).setScale(2, BigDecimal.ROUND_DOWN));
-        });
-        map.put("dayRank", daylist);
+        // List<QuantStrategyProfit> daylist = quantStrategyProfitService.findRank(DateUtils.getCurrentDateFirstSec());
+        // // 当天第一笔统计
+        // long firstSec = DateUtils.getCurrentDateFirstSec();
+        // List<QuantStrategyProfit> firstlist = quantStrategyProfitService.findTodayFirstStats(firstSec);
+        // daylist.forEach(stats -> {
+        // BigDecimal firstProfit = BigDecimal.ZERO;
+        // List<QuantStrategyProfit> matchList = firstlist.stream().filter(l -> l.getStrategyId().equals(stats.getStrategyId())).collect(Collectors.toList());
+        // if (CollectionUtils.isNotEmpty(matchList))
+        // {
+        // QuantStrategyProfit firstStats = matchList.get(0);
+        // if (firstStats.getDisplayTime().equals(firstSec))
+        // {
+        // firstProfit = firstStats.getProfit();
+        // }
+        // }
+        // stats.setProfit(stats.getProfit().subtract(firstProfit).setScale(2, BigDecimal.ROUND_DOWN));
+        // });
+        // map.put("dayRank", daylist);
         map.put("hisRank", hislist);
         map.put("code", 200);
         return map;
     }
-
+    
+    /**
+     * 查询波动排名
+     * @return
+     */
+    @PostMapping("/changeRank")
+    public Map<String, Object> changeRank()
+    {
+        getOnlineUserId();
+        Map<String, Object> map = new HashMap<>();
+        QuantQuoteChange query = new QuantQuoteChange();
+        query.setStartTime(DateUtils.getCurrentDateFirstSec());
+        List<QuantQuoteChange> list = quantQuoteChangeService.findList(query);
+        map.put("changeRank", list);
+        map.put("code", 200);
+        return map;
+    }
+    
     @PostMapping("/stats")
     public Map<String, Object> stats(Long id)
     {
         return quantStrategyProfitService.getProfitStats(id);
-
     }
-    
-
 }

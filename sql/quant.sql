@@ -2758,3 +2758,21 @@ CREATE TABLE `quant_strategy_profit`
   PRIMARY KEY (`id`)
 ) ROW_FORMAT = COMPACT COMMENT ='策略收益统计表';
 
+--20200918
+DROP TABLE IF EXISTS `quant_quote_change`;
+CREATE TABLE `quant_quote_change`
+(
+       `id`           bigint COMMENT 'ID',
+       `exchange`  varchar(255)        NOT NULL COMMENT '交易所',
+       `currency`  varchar(255)        NOT NULL COMMENT '币种',
+       `symbol`  varchar(255)        NOT NULL COMMENT '交易对',
+       `change_rate`       decimal(16, 8) NOT NULL COMMENT '波动率阈值',
+       `change_count`  bigint         NOT NULL COMMENT '波动次数',
+       `start_time` bigint         NOT NULL COMMENT '开始时间（一般取当天零点）',
+       `open_price`       decimal(16, 8) NOT NULL COMMENT '开盘价',
+       `close_price`       decimal(16, 8) NOT NULL COMMENT '收盘价',
+       `base_price`       decimal(16, 8) NOT NULL COMMENT '基准价',
+       `update_time` bigint   NOT NULL COMMENT '更新时间',
+       PRIMARY KEY (`id`)
+) ROW_FORMAT = COMPACT COMMENT ='策略行情波动统计表';
+

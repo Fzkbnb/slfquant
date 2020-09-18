@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.slf.quant.dao.QuantQuoteChangeMapper">
+
+
+    <!-- 基础列 -->
+    <sql id="quantQuoteChangeColumns">
+        a.id as id,
+        a.currency as currency,
+        a.exchange as exchange,
+        a.symbol as symbol,
+        a.change_count as changeCount,
+        a.change_rate as changeRate,
+        a.open_price as openPrice,
+        a.close_price as closePrice,
+        a.base_price as basePrice,
+        a.start_time as startTime,
+        a.update_time as updateTime
+    </sql>
+
+    <!-- 普通插入 -->
+    <insert id="insert" parameterType="com.slf.quant.facade.entity.strategy.QuantQuoteChange">
+        insert into quant_quote_change(
+            id ,
+            currency ,
+            exchange ,
+            symbol ,
+            change_count ,
+            change_rate ,
+            open_price ,
+            close_price ,
+            base_price,
+            start_time,
+            update_time
+        ) VALUES (
+            #{id} ,
+            #{currency} ,
+            #{exchange} ,
+            #{symbol} ,
+            #{changeCount} ,
+            #{changeRate} ,
+            #{openPrice} ,
+            #{closePrice} ,
+            #{basePrice},
+            #{startTime},
+            #{updateTime}
+        )
+    </insert>
+
+
+    <!-- 根据主键更新一条信息所有数据 -->
+    <update id="updateByPrimaryKey" parameterType="com.slf.quant.facade.entity.strategy.QuantQuoteChange">
+        update quant_quote_change set
+            currency = #{currency} ,
+            exchange = #{exchange} ,
+            symbol = #{symbol} ,
+            change_count = #{changeCount} ,
+            change_rate = #{changeRate} ,
+            open_price = #{openPrice} ,
+            close_price = #{closePrice} ,
+            base_price = #{basePrice} ,
+            start_time = #{startTime},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <!-- 选择性更新数据 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.slf.quant.facade.entity.strategy.QuantQuoteChange">
+        update quant_quote_change
+        <set>
+            <if test="currency != null">
+                currency = #{currency} ,
+            </if>
+            <if test="exchange != null">
+                exchange = #{exchange} ,
+            </if>
+            <if test="symbol != null">
+                symbol = #{symbol} ,
+            </if>
+            <if test="changeCount != null">
+                change_count = #{changeCount} ,
+            </if>
+            <if test="changeRate != null">
+                change_rate = #{changeRate} ,
+            </if>
+            <if test="openPrice != null">
+                open_price = #{openPrice} ,
+            </if>
+            <if test="closePrice != null">
+                close_price = #{closePrice} ,
+            </if>
+            <if test="basePrice != null">
+                base_price = #{basePrice} ,
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 根据主键物理删除 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from quant_quote_change where id = #{id}
+    </delete>
+
+    <!-- 可分页的对象查询 -->
+    <select id="findList" resultType="com.slf.quant.facade.entity.strategy.QuantQuoteChange">
+        SELECT
+        <include refid="quantQuoteChangeColumns"/>
+        FROM quant_quote_change a
+        WHERE 1=1
+        <if test="exchange != null and exchange != ''">
+            and a.exchange = #{exchange}
+        </if>
+        <if test="currency != null and currency != ''">
+            and a.currency = #{currency}
+        </if>
+        <if test="symbol != null and symbol != ''">
+            and a.symbol = #{symbol}
+        </if>
+        <if test="startTime != null">
+            and a.start_time = #{startTime}
+        </if>
+        <if test="changeRate != null">
+            and a.change_rate = #{changeRate}
+        </if>
+        order by a.change_count desc
+    </select>
+    <select id="selectAll" resultType="com.slf.quant.facade.entity.strategy.QuantQuoteChange">
+        SELECT
+        <include refid="quantQuoteChangeColumns"/>
+        FROM quant_quote_change a
+        where 1=1
+    </select>
+
+
+
+</mapper>

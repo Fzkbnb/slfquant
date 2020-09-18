@@ -145,7 +145,6 @@ public class QuantGridConfigScanTask
     
     private void stop(Long id)
     {
-        quantGridConfigService.changeStatus(id, 4);
         AbstractGridUsdtClient client = TradeConst.grid_running_map.get(id);
         if (null != client)
         {// 已发出停止指令则不需要重复停
