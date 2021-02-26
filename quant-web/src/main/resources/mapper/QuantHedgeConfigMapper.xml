@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.slf.quant.dao.QuantHedgeConfigMapper">
+    <!-- 基础列 -->
+    <sql id="quantHedgeConfigColumns">
+        a.id as id,
+        a.account_id as accountId,
+        a.exchange as exchange,
+        a.exchange_account as exchangeAccount,
+        a.currency as currency,
+        a.long_symbol as longSymbol,
+        a.short_symbol as shortSymbol,
+        a.open_ratio as openRatio,
+        a.close_ratio as closeRatio,
+        a.lever_rate as leverRate,
+        a.entrust_cont as entrustCont,
+        a.max_hold_cont as maxHoldCont,
+        a.status as status,
+        a.create_time as createTime,
+        a.update_time as updateTime
+    </sql>
+
+    <!-- 普通插入 -->
+    <insert id="insert" parameterType="com.slf.quant.facade.entity.strategy.QuantHedgeConfig">
+        insert into quant_hedge_config(
+            id ,
+            account_id ,
+            exchange ,
+            exchange_account ,
+            currency ,
+            long_symbol ,
+            short_symbol ,
+            open_ratio ,
+            close_ratio,
+            lever_rate,
+            entrust_cont,
+            max_hold_cont,
+            status,
+            create_time,
+            update_time
+        ) VALUES (
+            #{id} ,
+            #{accountId} ,
+            #{exchange} ,
+            #{exchangeAccount} ,
+            #{currency} ,
+            #{longSymbol} ,
+            #{shortSymbol} ,
+            #{openRatio} ,
+            #{closeRatio},
+            #{leverRate},
+            #{entrustCont},
+            #{maxHoldCont},
+            #{status},
+            #{createTime},
+            #{updateTime}
+        )
+    </insert>
+
+
+    <!-- 根据主键更新一条信息所有数据 -->
+    <update id="updateByPrimaryKey" parameterType="com.slf.quant.facade.entity.strategy.QuantHedgeConfig">
+        update quant_hedge_config set
+            account_id = #{accountId} ,
+            exchange = #{exchange} ,
+            exchange_account = #{exchangeAccount} ,
+            currency = #{currency} ,
+            long_symbol = #{longSymbol} ,
+            short_symbol = #{shortSymbol} ,
+            open_ratio = #{openRatio} ,
+            close_ratio = #{closeRatio} ,
+            lever_rate = #{leverRate} ,
+            entrust_cont = #{entrustCont} ,
+            max_hold_cont = #{maxHoldCont} ,
+            status = #{status},
+            create_time = #{createTime},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <!-- 选择性更新数据 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.slf.quant.facade.entity.strategy.QuantHedgeConfig">
+        update quant_hedge_config
+        <set>
+            <if test="accountId != null">
+                account_id = #{accountId} ,
+            </if>
+            <if test="exchange != null">
+                exchange = #{exchange} ,
+            </if>
+            <if test="exchangeAccount != null">
+                exchange_account = #{exchangeAccount} ,
+            </if>
+            <if test="currency != null">
+                currency = #{currency} ,
+            </if>
+            <if test="longSymbol != null">
+                long_symbol = #{longSymbol} ,
+            </if>
+            <if test="shortSymbol != null">
+                short_symbol = #{shortSymbol} ,
+            </if>
+            <if test="openRatio != null">
+                open_ratio = #{openRatio} ,
+            </if>
+            <if test="closeRatio != null">
+                close_ratio = #{closeRatio} ,
+            </if>
+            <if test="leverRate != null">
+                lever_rate = #{leverRate} ,
+            </if>
+            <if test="entrustCont != null">
+                entrust_cont = #{entrustCont} ,
+            </if>
+            <if test="maxHoldCont != null">
+                max_hold_cont = #{maxHoldCont} ,
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 根据主键物理删除 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from quant_hedge_config where id = #{id}
+    </delete>
+
+    <!-- 可分页的对象查询 -->
+    <select id="findList" resultType="com.slf.quant.facade.entity.strategy.QuantHedgeConfig">
+        SELECT
+        <include refid="quantHedgeConfigColumns"/>
+        FROM quant_hedge_config a
+        WHERE 1=1
+
+        <if test="accountId != null">
+            and a.account_id = #{accountId}
+        </if>
+        <if test="status != null">
+            and a.status = #{status}
+        </if>
+        <if test="exchangeAccount != null and exchangeAccount != ''">
+            and a.exchange_account = #{exchangeAccount}
+        </if>
+
+        <if test="currency != null and currency != ''">
+            and a.currency = #{currency}
+        </if>
+        order by a.id desc
+    </select>
+
+    <select id="selectAll" resultType="com.slf.quant.facade.entity.strategy.QuantHedgeConfig">
+        SELECT
+        <include refid="quantHedgeConfigColumns"/>
+        FROM quant_hedge_config a
+    </select>
+    <update id="changeStatus">
+        update quant_hedge_config set
+            status =#{status}
+        where id = #{id}
+    </update>
+
+    <update id="changeAllStatus">
+        update quant_hedge_config set
+            status =#{status}
+        where 1=1
+    </update>
+
+
+</mapper>

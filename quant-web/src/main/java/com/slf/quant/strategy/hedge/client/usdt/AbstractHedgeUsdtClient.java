@@ -1,63 +1,83 @@
 package com.slf.quant.strategy.hedge.client.usdt;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import com.slf.quant.facade.consts.KeyConst;
+import com.slf.quant.facade.entity.strategy.QuantHedgeConfig;
 import com.slf.quant.facade.model.ContractOrder;
 import com.slf.quant.facade.model.QuoteDepth;
+import com.slf.quant.facade.model.StrategyStatusModel;
 import com.slf.quant.facade.model.hedge.*;
+import com.slf.quant.facade.service.strategy.QuantGridConfigService;
+import com.slf.quant.facade.service.strategy.QuantHedgeConfigService;
+import com.slf.quant.facade.service.strategy.QuantStrategyProfitService;
+import com.slf.quant.facade.utils.SpringContext;
 import com.slf.quant.strategy.consts.TradeConst;
 import org.apache.commons.lang3.ObjectUtils;
-
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Data
-public abstract class AbstractUsdtClient
+public abstract class AbstractHedgeUsdtClient
 {
-    protected Config     config;
+    protected QuantHedgeConfigService    quantHedgeConfigService    = SpringContext.getBean("quantHedgeConfigServiceImpl");
     
-    private String       apiKey;
+    protected QuantStrategyProfitService quantStrategyProfitService = SpringContext.getBean("quantStrategyProfitServiceImpl");
     
-    private String       secretKey;
+    protected QuantHedgeConfig           config;
     
-    private String       passPhrase;
+    private String                       apiKey;
     
-    private HedgeModel hedgeModel;
+    private String                       secretKey;
     
-    private Ticker ticker;
+    private String                       passPhrase;
     
-    private Account account;
+    private HedgeModel                   hedgeModel;
     
-    private Position longPosition;
+    private Ticker                       ticker;
     
-    private Position     shortPosition;
+    private Account                      account;
     
-    private boolean      stopFlag       = false;
+    private Position                     longPosition;
     
-    private boolean      isOpenHedging  = false;
+    private Position                     shortPosition;
     
-    private boolean      isCloseHedging = false;
+    private boolean                      stopFlag                   = false;
     
-    private int          runStatus;
+    private boolean                      isOpenHedging              = false;
     
-    protected BigDecimal contractPerValue;        // 合约面值
+    private boolean                      isCloseHedging             = false;
     
-    protected int        contract_price_precision;
+    private int                          runStatus;
     
-    protected BigDecimal contract_tick_size;      // 合约价格最小精度值（例如0.01）
+    protected BigDecimal                 contractPerValue;                                                                    // 合约面值
     
-    public AbstractUsdtClient(Config config, String apiKey, String secretKey, String passPhrase)
+    protected int                        contract_price_precision;
+    
+    protected BigDecimal                 contract_tick_size;                                                                  // 合约价格最小精度值（例如0.01）
+    
+    protected ScheduledExecutorService   monitorEs;
+    
+    public AbstractHedgeUsdtClient(QuantHedgeConfig config, String apiKey, String secretKey, String passPhrase)
     {
         this.config = config;
         this.apiKey = apiKey;
         this.secretKey = secretKey;
         this.passPhrase = passPhrase;
+        monitorEs = new ScheduledThreadPoolExecutor(1);
     }
     
     public void start()
     {
+        monitorEs.scheduleWithFixedDelay(() -> monitorRisk(), 0, 15, TimeUnit.SECONDS);
         new Thread(() -> {
             long sleepTime = 0;
             while (!stopFlag)
@@ -280,6 +300,11 @@ public abstract class AbstractUsdtClient
                         BigDecimal openSlip = ticker.getOpenRatio().subtract(config.getOpenRatio());
                         if (openSlip.compareTo(BigDecimal.ZERO) == 1)
                         {
+                            // 开仓溢价率满足条件时，需要判断持仓张数是否达到最大值
+                            if (shortPosition.getShortCont().compareTo(config.getMaxHoldCont()) > -1 || longPosition.getLongCont().compareTo(config.getMaxHoldCont()) > -1)
+                            {
+                                continue;
+                            }
                             hedgeModel = new HedgeModel();
                             hedgeModel.setSlipRatio(BigDecimal.ONE.add(openSlip.multiply(TradeConst.slipRatio)));
                             ticker.setSlipRatio(openSlip.multiply(TradeConst.slipRatio));
@@ -316,6 +341,54 @@ public abstract class AbstractUsdtClient
                 }
             }
         }).start();
+    }
+    
+    private void monitorRisk()
+    {
+        try
+        {
+            if (null == account || null == ticker || null == longPosition || null == shortPosition)
+            { return; }
+            // todo
+            List<StrategyStatusModel> models = new ArrayList<>();
+            StrategyStatusModel m1 = new StrategyStatusModel();
+            m1.setKey("多/空持仓(张)");
+            m1.setValue(longPosition.getLongCont() + "/" + shortPosition.getShortCont());
+            StrategyStatusModel m2 = new StrategyStatusModel();
+            m2.setKey("多/空均价/开仓溢价率");
+            String openRateStr = "-";
+            if (longPosition.getLong_avg_price().compareTo(BigDecimal.ZERO) == 1)
+            {
+                BigDecimal currentPremiumRate = shortPosition.getShort_avg_price().subtract(longPosition.getLong_avg_price()).divide(longPosition.getLong_avg_price(), 4,
+                        BigDecimal.ROUND_DOWN);
+                openRateStr = currentPremiumRate.multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_DOWN) + "%";
+            }
+            m2.setValue(longPosition.getLong_avg_price() + "/" + shortPosition.getShort_avg_price() + "/" + openRateStr);
+            StrategyStatusModel m3 = new StrategyStatusModel();
+            m3.setKey("预设/当前平仓溢价率");
+            m3.setValue(config.getCloseRatio().multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_DOWN) + "%/"
+                    + ticker.getCloseRatio().multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_DOWN) + "%");
+            StrategyStatusModel m4 = new StrategyStatusModel();
+            m4.setKey("合约权益/可用保证金(USDT)");
+            m4.setValue(account.getEquity() + "/" + account.getAvailableMargin());
+            models.add(m1);
+            models.add(m2);
+            models.add(m3);
+            models.add(m4);
+            TradeConst.strategy_stats_map.put(KeyConst.REDISKEY_STRATEGY_STATS + config.getId(), models);
+        }
+        catch (Exception e)
+        {
+            log.info("套利策略{}定时统计任务异常:{}", config.getId(), e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    public void stop()
+    {
+        log.info(">>>套利策略{},关闭程序<<<", config.getId());
+        quantHedgeConfigService.changeStatus(config.getId(), 0);
+        stopFlag = true;
     }
     
     private boolean getOneMakerType()

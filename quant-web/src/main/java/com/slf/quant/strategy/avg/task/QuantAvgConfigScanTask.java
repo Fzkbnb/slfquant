@@ -12,6 +12,7 @@ import com.slf.quant.facade.service.strategy.QuantApiConfigService;
 import com.slf.quant.facade.service.strategy.QuantAvgConfigService;
 import com.slf.quant.facade.utils.EncryptUtils2;
 import com.slf.quant.strategy.avg.client.AbstractAvgClient;
+import com.slf.quant.strategy.avg.client.HuobiAvgClient;
 import com.slf.quant.strategy.avg.client.OkexAvgClient;
 import com.slf.quant.strategy.consts.TradeConst;
 import org.springframework.beans.BeanUtils;
@@ -63,13 +64,17 @@ public class QuantAvgConfigScanTask
                             AbstractAvgClient client = null;
                             if (KeyConst.EXCHANGE_HUOBI.equalsIgnoreCase(entity.getExchange()))
                             {
+                                QuantAvgConfig config = new QuantAvgConfig();
+                                BeanUtils.copyProperties(entity, config);
+                                // huobi
+                                client = new HuobiAvgClient(config, apiKey, secretKey, "");
                             }
                             else if (KeyConst.EXCHANGE_OKEX.equalsIgnoreCase(entity.getExchange()))
                             {
                                 String passPhrase = EncryptUtils2.desDecrypt(apiConfig.getPassPhrase());
                                 QuantAvgConfig config = new QuantAvgConfig();
                                 BeanUtils.copyProperties(entity, config);
-                                // okex交割合约
+                                // okex
                                 client = new OkexAvgClient(config, apiKey, secretKey, passPhrase);
                             }
                             if (null != client)

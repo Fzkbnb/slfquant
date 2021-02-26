@@ -9,6 +9,7 @@
     <script type="text/javascript" src="../static/easyui/jquery.min.js"></script>
     <script type="text/javascript" src="../static/easyui/jquery.easyui.min.js"></script>
     <script type="text/javascript" src="../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../static/js/echarts.js"></script>
     <script type="text/javascript" src="../static/js/datetimeformat.js"></script>
     <script type="text/javascript" src="../static/js/index.js"></script>
 </head>
@@ -26,13 +27,27 @@
         <tbody id="rankTb">
         </tbody>
     </table>
+    <div id="index_main_count" style="width: 420px;height:300px;"></div>
+
+
 </div>
 
 <div id="changeRank" class="easyui-panel" title="change rank"
      style="width:420px;height:600px;padding:10px;background:#fafafa;"
      data-options="iconCls:'icon-save',closable:true,collapsible:true,minimizable:true,maximizable:true">
+    <input id="changeSwitch" class="easyui-switchbutton" width="100" data-options="onText:'005',offText:'0015'">
     <table cellspacing="0px">
         <tbody id="changeTb">
+        </tbody>
+    </table>
+</div>
+
+<div id="premiumRank" class="easyui-panel" title="premium rank"
+     style="width:420px;height:600px;padding:10px;background:#fafafa;"
+     data-options="iconCls:'icon-save',closable:true,collapsible:true,minimizable:true,maximizable:true">
+    <!--<input id="changeSwitch" class="easyui-switchbutton" width="100" data-options="onText:'005',offText:'0015'">-->
+    <table cellspacing="0px">
+        <tbody id="premiumTb">
         </tbody>
     </table>
 </div>

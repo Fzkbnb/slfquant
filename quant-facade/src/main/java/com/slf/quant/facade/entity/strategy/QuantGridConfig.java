@@ -62,4 +62,10 @@ public class QuantGridConfig extends BaseEntity
     private Long       createTime;     // 配置创建时间
     
     private Long       updateTime;     // 配置更新时间
+    
+    private BigDecimal stopLossValue;  // 止损金额（单位usdt）
+    
+    private BigDecimal stopProfitValue;// 止盈金额（单位usdt）
+    
+    private Integer limitSize;      // 未对冲完成数量限制，当超出该数量且盈利为正时将全平并关停策略
 }

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>动平配置</title>
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/default/easyui.css" />
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/icon.css" />
+    <script type="text/javascript" src="../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../static/js/echarts.js"></script>
+    <script type="text/javascript" src="../static/js/strategy.js"></script>
+    <script type="text/javascript" src="../static/js/datetimeformat.js"></script>
+    <script type="text/javascript" src="../static/js/quantSwapAvgConfig.js"></script>
+
+</head>
+<body>
+<table id="quantSwapAvgConfigDataGrid" class="easyui-datagrid" fit="true" fitColumns="true" pagination="true" rownumbers="true"
+       singleSelect="true" url="/strategy/quantSwapAvgConfig/list" pageList="[30,40,50]" pageSize="30" toolbar="#tb" striped="true" title="动平配置">
+    <thead>
+    <tr>
+        <th field="id" width="120" align="center" hidden="true">主键</th>
+        <th field="accountId" width="120" align="center" hidden="true">账户id</th>
+        <th field="exchangeAccount" width="100" align="center">交易所账号</th>
+        <th field="currency" width="100" align="center">合约币种</th>
+        <th field="positionDirect" width="100" align="center" hidden="true">持仓方向</th>
+        <th field="firstBasePrice" width="100" align="center" hidden="true">初始基准价</th>
+        <th field="priceUpRate" width="100" align="center" hidden="true">行情上涨率触发值</th>
+        <th field="priceDownRate" width="100" align="center" hidden="true">行情下跌率触发值</th>
+        <th field="positionAmt" width="100" align="center" hidden="true">持仓数量</th>
+        <th field="usdtCapital" width="100" align="center" hidden="true">usdt初始本金</th>
+        <th field="status" width="100"  formatter="printStatus" align="center">运行状态</th>
+        <th field="stats" width="100"  formatter="printStats" align="center">统计信息</th>
+        <th field="createTime" width="100" formatter="formatDateByLong" align="center">创建时间</th>
+        <th field="updateTime" width="100" formatter="formatDateByLong" align="center">更新时间</th>
+    </tr>
+    </thead>
+</table>
+
+<div id="tb">
+    <div>
+        <a href="javascript:openQuantSwapAvgConfigAddDialog()" class="easyui-linkbutton" iconCls="add" plain="true">添加</a>
+        <a href="javascript:openQuantSwapAvgConfigModifyDialog()" class="easyui-linkbutton" iconCls="update" plain="true">修改</a>
+        <a href="javascript:deleteQuantSwapAvgConfig()" class="easyui-linkbutton" iconCls="delete" plain="true">删除</a>
+        <a href="javascript:searchQuantSwapAvgConfig()" class="easyui-linkbutton" iconCls="search" plain="true">刷新</a>
+    </div>
+</div>
+
+<div id="editQuantSwapAvgConfig" class="easyui-dialog" closed="true" buttons="#editQuantSwapAvgConfigTb">
+    <form method="post" id="quantSwapAvgConfigForm">
+        <table cellspacing="8px">
+            <tr>
+                <td>交易所账号:</td>
+                <td><input id="exchangeAccount" name="exchangeAccount" type="text" /></td>
+            </tr>
+            <tr>
+                <td>合约币种:</td>
+                <td>
+                    <select id="currency" class="easyui-combobox" name="currency"  data-options="required:true">
+                        <option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
+                        <option value="EOS">EOS</option>
+                        <option value="BCH">BCH</option>
+                        <option value="TRX">TRX</option>
+                    </select>
+                    </td>
+            </tr>
+            <tr>
+                <td>持仓方向:</td>
+                <td>
+                    <select id="positionDirect" class="easyui-combobox" style="width:305px;" name="positionDirect"  data-options="required:true">
+                        <option value="1">多</option>
+                        <option value="-1">空</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>初始基准价:</td>
+                <td><input id="firstBasePrice" name="firstBasePrice" type="text" /></td>
+            </tr>
+            <tr>
+                <td>行情上涨率触发值:</td>
+                <td><input id="priceUpRate" name="priceUpRate" type="text" /></td>
+            </tr>
+            <tr>
+                <td>行情下跌率触发值:</td>
+                <td><input id="priceDownRate" name="priceDownRate" type="text" /></td>
+            </tr>
+            <tr>
+                <td>持仓数量:</td>
+                <td><input id="positionAmt" name="positionAmt" type="text" /></td>
+            </tr>
+            <tr>
+                <td>usdt初始本金:</td>
+                <td><input id="usdtCapital" name="usdtCapital" type="text" /></td>
+            </tr>
+            <tr>
+                <td>运行状态:</td>
+
+                <td>
+                    <select id="status" class="easyui-combobox" name="status" style="width:305px;"   data-options="required:true">
+                        <option value="0">已停止</option>
+                        <option value="1">运行中</option>
+                        <option value="3">启动中</option>
+                        <option value="4">停止中</option>
+                    </select>
+
+            </tr>
+        </table>
+    </form>
+</div>
+<div id="statsTable" class="easyui-dialog" closed="true">
+    <table cellspacing="0px">
+        <tbody id="tbody">
+        </tbody>
+    </table>
+    <div id="main" style="width: 600px;height:400px;"></div>
+</div>
+<div id="editQuantSwapAvgConfigTb">
+    <a href="javascript:saveData()" class="easyui-linkbutton" iconCls="save">保存</a>
+    <a href="javascript:closeDlg()" class="easyui-linkbutton" iconCls="closed">关闭</a>
+</div>
+
+</body>
+</html>

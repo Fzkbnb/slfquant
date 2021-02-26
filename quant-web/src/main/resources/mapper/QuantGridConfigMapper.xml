@@ -22,8 +22,11 @@
         a.min_sell_price as minSellPrice,
         a.fee_rate as feeRate,
         a.lever_rate as leverRate,
+        a.limit_size as limitSize,
         a.status as status,
         a.create_time as createTime,
+        a.stop_loss_value as stopLossValue,
+        a.stop_profit_value as stopProfitValue,
         a.update_time as updateTime
     </sql>
 
@@ -45,8 +48,11 @@
             min_sell_price,
             fee_rate,
             lever_rate,
+            limit_size,
             status,
             create_time,
+            stop_loss_value,
+            stop_profit_value,
             update_time
         ) VALUES (
             #{id} ,
@@ -64,8 +70,11 @@
             #{minSellPrice},
             #{feeRate},
             #{leverRate},
+            #{limitSize},
             #{status},
             #{createTime},
+            #{stopLossValue},
+            #{stopProfitValue},
             #{updateTime}
         )
     </insert>
@@ -88,8 +97,11 @@
             min_sell_price = #{minSellPrice} ,
             fee_rate = #{feeRate} ,
             lever_rate = #{leverRate},
+            limit_size = #{limitSize},
             status = #{status},
             create_time = #{createTime},
+            stop_loss_value = #{stopLossValue},
+            stop_profit_value = #{stopProfitValue},
             update_time = #{updateTime}
         where id = #{id}
     </update>
@@ -140,11 +152,20 @@
             <if test="leverRate != null">
                 lever_rate = #{leverRate},
             </if>
+            <if test="limitSize != null">
+                limit_size = #{limitSize},
+            </if>
             <if test="status != null">
                 status = #{status},
             </if>
             <if test="createTime != null">
                 create_time = #{createTime},
+            </if>
+            <if test="stopLossValue != null">
+                stop_loss_value = #{stopLossValue},
+            </if>
+            <if test="stopProfitValue != null">
+                stop_profit_value = #{stopProfitValue},
             </if>
             <if test="updateTime != null">
                 update_time = #{updateTime}

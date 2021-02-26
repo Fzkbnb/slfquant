@@ -1,6 +1,7 @@
 package com.slf.quant.service.impl;
 
 import com.slf.quant.facade.model.GridContractSumInfo;
+import com.slf.quant.facade.model.GridHedgeContModel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.slf.quant.facade.bean.BaseServiceImpl;
@@ -10,6 +11,7 @@ import com.slf.quant.dao.QuantGridStatsMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * QuantGridStatsServiceImpl：
@@ -32,6 +34,12 @@ public class QuantGridStatsServiceImpl extends BaseServiceImpl<QuantGridStats> i
     @Override
     public GridContractSumInfo findSumInfo(Long strategyId, int orderStatus, BigDecimal contractValue)
     {
-        return quantGridStatsMapper.findSumInfo(strategyId,orderStatus,contractValue);
+        return quantGridStatsMapper.findSumInfo(strategyId, orderStatus, contractValue);
+    }
+    
+    @Override
+    public List<GridHedgeContModel> findHedgeCount(Long strategyId)
+    {
+        return quantGridStatsMapper.findHedgeCount(strategyId);
     }
 }

@@ -197,4 +197,24 @@
       and order_status =  #{orderStatus}
     </select>
 
+
+    <select id="findHedgeCount" resultType="com.slf.quant.facade.model.GridHedgeContModel">
+     select
+     a.day as time,
+     count(1) as count
+     from (
+
+         select id,
+         update_time,
+         update_time-mod(update_time,24*60*60*1000) as day
+         from quant_grid_stats where 1=1
+        <if test="strategyId != null">
+            and strategy_id = #{strategyId}
+        </if>
+         and order_status=1
+         ) a
+      group  by a.day
+      order by a.day
+    </select>
+
 </mapper>

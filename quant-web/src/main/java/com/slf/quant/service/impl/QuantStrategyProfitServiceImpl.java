@@ -1,6 +1,8 @@
 package com.slf.quant.service.impl;
 
+import com.slf.quant.dao.QuantGridStatsMapper;
 import com.slf.quant.facade.consts.KeyConst;
+import com.slf.quant.facade.model.GridHedgeContModel;
 import com.slf.quant.facade.model.StrategyStatusModel;
 import com.slf.quant.strategy.consts.TradeConst;
 import org.apache.commons.collections.CollectionUtils;
@@ -27,6 +29,9 @@ import java.util.Map;
 public class QuantStrategyProfitServiceImpl extends BaseServiceImpl<QuantStrategyProfit> implements QuantStrategyProfitService
 {
     protected QuantStrategyProfitMapper quantStrategyProfitMapper;
+    
+    @Autowired
+    private QuantGridStatsMapper        quantGridStatsMapper;
     
     @Autowired
     public QuantStrategyProfitServiceImpl(QuantStrategyProfitMapper quantStrategyProfitMapper)
@@ -58,6 +63,11 @@ public class QuantStrategyProfitServiceImpl extends BaseServiceImpl<QuantStrateg
     {
         String key = KeyConst.REDISKEY_STRATEGY_STATS + id;
         Map<String, Object> map = new HashMap<>();
+        //先统计每日对冲次数统计（北京时间早上8点作为每日分界点）
+        List<GridHedgeContModel> privates = quantGridStatsMapper.findHedgeCount(id);
+        List<GridHedgeContModel> publics = quantGridStatsMapper.findHedgeCount(null);
+        map.put("privateCount",privates);
+        map.put("publicCount",publics);
         List<StrategyStatusModel> list = TradeConst.strategy_stats_map.get(key);
         if (CollectionUtils.isNotEmpty(list))
         {

@@ -2607,9 +2607,7 @@ CREATE TABLE `t_user`  (
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES (1, 'admin', 'admin123', '兰杰', NULL, '管理员');
-INSERT INTO `t_user` VALUES (3, 'marry', '123456', '玛丽', '仓库管理员,销售经理,采购员,主管', '销售经理');
-INSERT INTO `t_user` VALUES (10, 'gucaini', '123456', '古采尼', '采购员,主管,销售经理', '古大师');
+INSERT INTO `t_user` VALUES (1, 'admin', 'admin123', 'fzk', NULL, '管理员');
 
 -- ----------------------------
 -- Table structure for t_user_role
@@ -2655,6 +2653,9 @@ INSERT INTO `t_role_menu` VALUES (131, 70, 1);
 
 INSERT INTO `t_menu` VALUES (7040, 'menu-74', '动态平衡配置', 70, 0, '/strategy/quantAvgConfig.html');
 INSERT INTO `t_role_menu` VALUES (132, 7040, 1);
+
+
+
 DROP TABLE IF EXISTS `quant_grid_stats`;
 CREATE TABLE quant_grid_stats
 (
@@ -2701,6 +2702,14 @@ CREATE TABLE `quant_grid_config`
   `update_time`      bigint         NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ROW_FORMAT = COMPACT COMMENT ='网格配置表';
+
+--20210107新增字段
+alter table quant_grid_config add(limit_size int COMMENT '订单数量限制');
+
+--20201124新增字段
+alter table quant_grid_config add(`stop_loss_value`         decimal(8, 4) COMMENT '止损值usdt');
+alter table quant_grid_config add(`stop_profit_value`         decimal(8, 4) COMMENT '止盈值usdt');
+
 DROP TABLE IF EXISTS `quant_api_config`;
 CREATE TABLE `quant_api_config`
 (
@@ -2775,4 +2784,59 @@ CREATE TABLE `quant_quote_change`
        `update_time` bigint   NOT NULL COMMENT '更新时间',
        PRIMARY KEY (`id`)
 ) ROW_FORMAT = COMPACT COMMENT ='策略行情波动统计表';
+
+INSERT INTO `t_menu` VALUES (7050, 'menu-75', '套利配置', 70, 0, '/strategy/quantHedgeConfig.html');
+INSERT INTO `t_role_menu` VALUES (133, 7050, 1);
+
+DROP TABLE IF EXISTS `quant_hedge_config`;
+CREATE TABLE `quant_hedge_config`
+(
+       `id`                 bigint COMMENT 'ID',
+       `account_id`         bigint         NOT NULL COMMENT '用户ID',
+       `exchange`           varchar(255)   NOT NULL COMMENT '交易所',
+       `exchange_account`   varchar(255)   NOT NULL COMMENT '交易所账户',
+       `currency`           varchar(255)   NOT NULL COMMENT '交易币种',
+       `long_symbol`        varchar(255)   NOT NULL COMMENT '做多交易对',
+       `short_symbol`       varchar(255)   NOT NULL COMMENT '做空交易对',
+       `entrust_cont`       decimal(16, 8) NOT NULL COMMENT '单笔委托张数',
+       `max_hold_cont`       decimal(16, 8) NOT NULL COMMENT '最大单边持仓张数',
+       `open_ratio`         decimal(8, 6) NOT NULL COMMENT '开仓溢价率',
+       `close_ratio`        decimal(8, 6) NOT NULL COMMENT '平仓溢价率',
+       `lever_rate`         decimal(16, 8) NOT NULL COMMENT '杠杆倍数',
+       `status`             int            not null COMMENT '运行状态',
+       `create_time`        bigint         NOT NULL COMMENT '创建日期',
+       `update_time`        bigint         NOT NULL COMMENT '更新时间',
+       PRIMARY KEY (`id`)
+) ROW_FORMAT = COMPACT COMMENT ='套利配置表';
+
+INSERT INTO `t_menu` VALUES (7060, 'menu-76', '永续动态平衡配置', 70, 0, '/strategy/quantSwapAvgConfig.html');
+INSERT INTO `t_role_menu` VALUES (134, 7060, 1);
+
+
+DROP TABLE IF EXISTS `quant_swapavg_config`;
+CREATE TABLE `quant_swapavg_config`
+(
+  `id`                 bigint COMMENT 'ID',
+  `account_id`         bigint         NOT NULL COMMENT '用户ID',
+  `exchange`           varchar(255)   NOT NULL COMMENT '交易所',
+  `exchange_account`   varchar(255)   NOT NULL COMMENT '交易所账户',
+  `currency`           varchar(255)   NOT NULL COMMENT '交易币种',
+  `symbol`             varchar(255)   NOT NULL COMMENT '交易对',
+  `first_base_price`   decimal(16, 8) NOT NULL COMMENT '初始基准价',
+  `current_base_price` decimal(16, 8) NOT NULL COMMENT '当前基准价',
+  `price_up_rate`      decimal(16, 8) NOT NULL COMMENT '价格上涨率触发值',
+  `price_down_rate`    decimal(16, 8) NOT NULL COMMENT '价格下跌率触发值',
+  `usdt_capital`       decimal(24, 8) NOT NULL COMMENT '投入本金折合usdt',
+  `enable_margin`       decimal(24, 8)  COMMENT '可用保证金',
+  `position_value`       decimal(24, 8)  COMMENT '持仓价值',
+  `position_direct`       int    NOT NULL  COMMENT '持仓方向',
+  `last_price`         decimal(16, 8) NOT NULL COMMENT '最新行情价格',
+  `trade_count`        decimal(16)    NOT NULL COMMENT '交易次数',
+  `status`             int            not null COMMENT '运行状态',
+  `create_time`        bigint         NOT NULL COMMENT '创建日期',
+  `update_time`        bigint         NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ROW_FORMAT = COMPACT COMMENT ='永续合约动态平衡配置表';
+
+
 

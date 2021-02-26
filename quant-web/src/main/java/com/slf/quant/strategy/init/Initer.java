@@ -4,6 +4,7 @@ import com.slf.quant.facade.consts.KeyConst;
 import com.slf.quant.facade.service.strategy.QuantGridStatsService;
 import com.slf.quant.facade.utils.SpringContext;
 import com.slf.quant.strategy.avg.task.QuantAvgConfigScanTask;
+import com.slf.quant.strategy.hedge.task.QuantHedgeConfigScanTask;
 import com.slf.quant.strategy.triangular.client.AbstractTriangularClient;
 import com.slf.quant.strategy.triangular.quote.QuoteTtriangularWebsocketTask;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class Initer implements ApplicationRunner
     private QuantGridConfigScanTask       quantGridConfigScanTask;
     
     @Autowired
+    private QuantHedgeConfigScanTask      quantHedgeConfigScanTask;
+    
+    @Autowired
     private QuoteWebsocketTask            quoteWebsocketTask;
     
     @Autowired
@@ -45,9 +49,11 @@ public class Initer implements ApplicationRunner
     @Override
     public void run(ApplicationArguments args)
     {
-//        quoteHedgeWebsocketTask.start();
-//        quoteAnalysisTask.start();
-        // todo 暂时单体结构，同时启动动瓶，网格两个策略
+        log.info(">>>开始启动套利策略配置扫描任务<<<");
+        quoteHedgeWebsocketTask.start();
+        quoteAnalysisTask.start();
+        quantHedgeConfigScanTask.start();
+        // todo 暂时单体结构，同时启动动平，网格两个策略
         log.info(">>>开始启动网格策略配置扫描任务<<<");
         quoteWebsocketTask.start();
         quantGridConfigScanTask.start();

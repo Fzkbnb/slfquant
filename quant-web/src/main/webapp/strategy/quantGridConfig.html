@@ -28,6 +28,7 @@
         <th field="entrustCont" width="100" align="center" hidden="true">单笔委托张数</th>
         <th field="firstDirect" width="100" align="center" hidden="true">优先下单方向</th>
         <th field="leverRate" width="100" align="center" hidden="true">杠杆倍数</th>
+        <th field="limitSize" width="100" align="center" hidden="true">订单数量限制</th>
         <th field="status" width="100"  formatter="printStatus" align="center">运行状态</th>
         <th field="stats" width="100"  formatter="printStats" align="center">统计信息</th>
         <th field="updateTime" width="100" formatter="formatDateByLong" align="center">更新时间</th>
@@ -92,6 +93,18 @@
                 <td><input id="minSellPrice" name="minSellPrice" type="text" /></td>
             </tr>
             <tr>
+                <td>止盈金额:</td>
+                <td><input id="stopProfitValue" name="stopProfitValue" type="text" /></td>
+            </tr>
+            <tr>
+                <td>止损金额:</td>
+                <td><input id="stopLossValue" name="stopLossValue" type="text" /></td>
+            </tr>
+            <tr>
+                <td>订单数量限制:</td>
+                <td><input id="limitSize" name="limitSize" type="text" /></td>
+            </tr>
+            <tr>
                 <td>杠杆倍数:</td>
                 <td><input id="leverRate" name="leverRate" type="text" /></td>
             </tr>
@@ -119,6 +132,7 @@
             <tbody id="tbody">
             </tbody>
         </table>
+    <div id="main_count" style="width: 600px;height:400px;"></div>
         <div id="main" style="width: 600px;height:400px;"></div>
 </div>
 

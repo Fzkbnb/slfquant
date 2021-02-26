@@ -1,29 +1,30 @@
 package com.slf.quant.facade.sdk.okex.service.swap;
 
-
+import com.alibaba.fastjson.JSONObject;
 import com.slf.quant.facade.sdk.okex.bean.swap.param.*;
 
-public interface SwapTradeAPIService {
+public interface SwapTradeAPIService
+{
     /**
      * 下单
      * @param ppOrder
      * @return
      */
     Object order(PpOrder ppOrder);
-
+    
     /**
      * 批量下单
      * @param ppOrders
      * @return
      */
     String orders(PpOrders ppOrders);
-
+    
     /**
      * 获取订单信息
      * @return
      */
     String getOrders();
-
+    
     /**
      * 撤单
      * @param instrument_id
@@ -31,9 +32,15 @@ public interface SwapTradeAPIService {
      * @return
      */
     String cancelOrderByOrderId(String instrument_id, String order_id);
-
+    
     String cancelOrderByClientOid(String instrument_id, String client_oid);
-
+    
+    /**
+     * 市价全平
+     * 
+     */
+    JSONObject closePosition(String instrument_id, String direct);
+    
     /**
      * 批量撤单
      * @param instrumentId
@@ -41,21 +48,21 @@ public interface SwapTradeAPIService {
      * @return
      */
     String cancelOrders(String instrumentId, PpCancelOrderVO ppCancelOrderVO);
-
+    
     /**
      * 策略委托下单
      * @param swapOrderParam
      * @return
      */
     String swapOrderAlgo(SwapOrderParam swapOrderParam);
-
+    
     /**
      * 策略委托撤单
      * @param cancelOrderAlgo
      * @return
      */
     String cancelOrderAlgo(CancelOrderAlgo cancelOrderAlgo);
-
+    
     /**
      * 查看策略委托订单
      * @param instrument_id
@@ -67,11 +74,5 @@ public interface SwapTradeAPIService {
      * @param limit
      * @return
      */
-    String getSwapOrders(String instrument_id,
-                         String order_type,
-                         String status,
-                         String algo_id,
-                         String before,
-                         String after,
-                         String limit);
+    String getSwapOrders(String instrument_id, String order_type, String status, String algo_id, String before, String after, String limit);
 }

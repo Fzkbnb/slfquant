@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.slf.quant.facade.consts.UrlConst;
+import com.slf.quant.facade.entity.strategy.QuantHedgeConfig;
 import com.slf.quant.facade.model.ContractOrder;
 import com.slf.quant.facade.model.QuoteDepth;
 import com.slf.quant.facade.model.hedge.Account;
-import com.slf.quant.facade.model.hedge.Config;
 import com.slf.quant.facade.model.hedge.Position;
 import com.slf.quant.facade.model.hedge.Ticker;
 import com.slf.quant.facade.sdk.okex.bean.futures.param.Order;
@@ -32,19 +32,18 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class OKexUsdtClient extends AbstractUsdtClient
+public class OKexHedgeUsdtClient extends AbstractHedgeUsdtClient
 {
     private FuturesMarketAPIService marketAPIService;
     
-    private AccountAPIService accountAPIService;
+    private AccountAPIService       accountAPIService;
     
-    private FuturesTradeAPIService tradeAPIService;
+    private FuturesTradeAPIService  tradeAPIService;
     
-    public OKexUsdtClient(Config config, String apiKey, String secretKey, String passPhrase)
+    public OKexHedgeUsdtClient(QuantHedgeConfig config, String apiKey, String secretKey, String passPhrase)
     {
         super(config, apiKey, secretKey, passPhrase);
         APIConfiguration config1 = new APIConfiguration();
@@ -69,8 +68,6 @@ public class OKexUsdtClient extends AbstractUsdtClient
         {
             throw new RuntimeException("合约币对不存在：" + config.getLongSymbol());
         }
-        JSONObject o = tradeAPIService.getInstrumentPosition("BCH-USDT-200626");
-        System.out.println(o);
     }
     
     @Override
@@ -88,8 +85,10 @@ public class OKexUsdtClient extends AbstractUsdtClient
                 {
                     position.setLongCont(obj.getBigDecimal("long_qty"));
                     position.setShortCont(obj.getBigDecimal("short_qty"));
+                    position.setLong_avg_price(obj.getBigDecimal("long_avg_cost"));
+                    position.setShort_avg_price(obj.getBigDecimal("short_avg_cost"));
                 }
-            }
+        }
         }
         catch (Exception e)
         {

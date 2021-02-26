@@ -115,11 +115,11 @@ public class AbstractTriangularClient
                                     .subtract(BigDecimal.TEN).setScale(8, BigDecimal.ROUND_DOWN);
                             maxProfit = ObjectUtils.max(maxProfit, profit1, profit2, profit3, profit4);
                         }
-                        // log.info("本次行情监控阶段发现最高溢价为{}USDT!", maxProfit);
-                        if (maxProfit.compareTo(BigDecimal.ZERO) == 1)
-                        {
-                            log.info("监控发现正溢价：{}", maxProfit);
-                        }
+                         log.debug("本次行情监控阶段发现最高溢价为{}USDT!", maxProfit);
+//                        if (maxProfit.compareTo(BigDecimal.ZERO) == 1)
+//                        {
+//                            log.info("监控发现正溢价：{}", maxProfit);
+//                        }
                         if (maxProfit.compareTo(BigDecimal.ONE) == 1)
                         {
                             log.info("监控发现最佳溢价：{}", maxProfit);

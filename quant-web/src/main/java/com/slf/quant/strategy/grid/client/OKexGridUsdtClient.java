@@ -164,6 +164,11 @@ public class OKexGridUsdtClient extends AbstractGridUsdtClient
     }
 
     @Override
+    protected long closePositionByMarket(String currency, String firstDirect) {
+        return 0;
+    }
+
+    @Override
     protected boolean cancelAllOrder() {
         return true;
     }

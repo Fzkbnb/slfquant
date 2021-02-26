@@ -68,7 +68,15 @@ function getStrategyStats(id) {
                         });
 
                         $('#tbody').html(html);
-                        //绘制折线图
+                        //绘制对冲次数折线图
+                        var times_count =[];
+                        var counts = [];
+                        $.each(data.privateCount, function (n, value) {
+                            times_count.push(getFormatDateByLong(value.time,"yyyy-MM-dd hh"));
+                            counts.push(value.count);
+                        });
+                        printHedgeCountLine(times_count,counts);
+                        //绘制收益折线图
                         var times =[];
                         var profits = [];
                         $.each(data.profits, function (n, value) {
@@ -88,6 +96,45 @@ function getStrategyStats(id) {
     });
 
 
+}
+
+function printHedgeCountLine(times,counts){
+    var myChart = echarts.init(document.getElementById('main_count'));
+    // 指定图表的配置项和数据
+    var option={
+        //标题
+        title:{
+            text:'每日对冲统计'
+        },
+        //工具箱
+        //保存图片
+        toolbox:{
+            show:true,
+            feature:{
+                saveAsImage:{
+                    show:true
+                }
+            }
+        },
+        //图例-每一条数据的名字叫销量
+        legend:{
+            data:['对冲次数']
+        },
+        //x轴
+        xAxis:{
+            data:times
+        },
+        //y轴没有显式设置，根据值自动生成y轴
+        yAxis:{},
+        //数据-data是最终要显示的数据
+        series:[{
+            name:'次数',
+            type:'line',
+            data:counts
+        }]
+    };
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
 }
 
 

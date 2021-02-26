@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>网格配置</title>
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/default/easyui.css" />
+    <link rel="stylesheet" type="text/css" href="../static/easyui/themes/icon.css" />
+    <script type="text/javascript" src="../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../static/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../static/js/echarts.js"></script>
+    <script type="text/javascript" src="../static/js/datetimeformat.js"></script>
+    <script type="text/javascript" src="../static/js/strategy.js"></script>
+    <script type="text/javascript" src="../static/js/quantHedgeConfig.js"></script>
+
+</head>
+<body>
+<table id="quantHedgeConfigDataGrid" class="easyui-datagrid" fit="true" fitColumns="true" pagination="true" rownumbers="true"
+       singleSelect="true" url="/strategy/quantHedgeConfig/list" pageList="[30,40,50]" pageSize="30" toolbar="#tb" striped="true" title="网格配置">
+    <thead>
+    <tr>
+        <th field="id" width="120" align="center" hidden="true">主键</th>
+        <th field="accountId" width="120" align="center" hidden="true">账户id</th>
+        <th field="exchangeAccount" width="100" align="center">交易所账号</th>
+        <th field="longSymbol" width="100" align="center">做多交易对</th>
+        <th field="shortSymbol" width="100" align="center">做空交易对</th>
+        <th field="openRatio" width="100" align="center" hidden="true">开仓溢价率</th>
+        <th field="closeRatio" width="100" align="center" hidden="true">平仓溢价率</th>
+        <th field="entrustCont" width="100" align="center" hidden="true">单笔委托张数</th>
+        <th field="maxHoldCont" width="100" align="center" hidden="true">最大单向持仓张数</th>
+        <th field="leverRate" width="100" align="center" hidden="true">杠杆倍数</th>
+        <th field="status" width="100"  formatter="printStatus" align="center">运行状态</th>
+        <th field="stats" width="100"  formatter="printStats" align="center">统计信息</th>
+        <th field="updateTime" width="100" formatter="formatDateByLong" align="center">更新时间</th>
+    </tr>
+    </thead>
+</table>
+
+<div id="tb">
+    <div>
+        <a href="javascript:openQuantHedgeConfigAddDialog()" class="easyui-linkbutton" iconCls="add" plain="true">添加</a>
+        <a href="javascript:openQuantHedgeConfigModifyDialog()" class="easyui-linkbutton" iconCls="update" plain="true">修改</a>
+        <a href="javascript:deleteQuantHedgeConfig()" class="easyui-linkbutton" iconCls="delete" plain="true">删除</a>
+        <a href="javascript:searchQuantHedgeConfig()" class="easyui-linkbutton" iconCls="search" plain="true">刷新</a>
+    </div>
+</div>
+
+<div id="editQuantHedgeConfig" class="easyui-dialog" closed="true" buttons="#editQuantHedgeConfigTb">
+    <form method="post" id="quantHedgeConfigForm">
+        <table cellspacing="8px">
+            <tr>
+                <td>交易所账号:</td>
+                <td><input id="exchangeAccount" name="exchangeAccount" type="text" /></td>
+            </tr>
+            <tr>
+                <td>做多交易对:</td>
+                <td><input id="longSymbol" name="longSymbol" type="text" /></td>
+            </tr>
+            <tr>
+                <td>做空交易对:</td>
+                <td><input id="shortSymbol" name="shortSymbol" type="text" /></td>
+            </tr>
+            <tr>
+                <td>开仓溢价率:</td>
+                <td><input id="openRatio" name="openRatio" type="text" /></td>
+            </tr>
+            <tr>
+                <td>平仓溢价率:</td>
+                <td><input id="closeRatio" name="closeRatio" type="text" /></td>
+            </tr>
+            <tr>
+                <td>单笔委托张数:</td>
+                <td><input id="entrustCont" name="entrustCont" type="text" /></td>
+            </tr>
+            <tr>
+                <td>最大单向持仓张数:</td>
+                <td><input id="maxHoldCont" name="maxHoldCont" type="text" /></td>
+            </tr>
+            <tr>
+                <td>杠杆倍数:</td>
+                <td><input id="leverRate" name="leverRate" type="text" /></td>
+            </tr>
+            <tr>
+                <td>运行状态:</td>
+
+                <td>
+                    <select id="status" class="easyui-combobox" name="status" style="width:305px;"   data-options="required:true">
+                        <option value="0">已停止</option>
+                        <option value="1">运行中</option>
+                        <option value="3">启动中</option>
+                        <option value="4">停止中</option>
+                    </select>
+
+            </tr>
+        </table>
+    </form>
+</div>
+<div id="statsTable" class="easyui-dialog" closed="true">
+        <table cellspacing="0px">
+            <tbody id="tbody">
+            </tbody>
+        </table>
+        <div id="main" style="width: 600px;height:400px;"></div>
+</div>
+
+<div id="editQuantHedgeConfigTb">
+    <a href="javascript:saveData()" class="easyui-linkbutton" iconCls="save">保存</a>
+    <a href="javascript:closeDlg()" class="easyui-linkbutton" iconCls="closed">关闭</a>
+</div>
+
+<div id="dlg2" class="easyui-dialog" closed="true" buttons="#dlgTb2">
+    <ul id="menuTree" class="easyui-tree"></ul>
+</div>
+
+<div id="dlgTb2">
+    <a href="javascript:setMenu()" class="easyui-linkbutton" iconCls="save">提交</a>
+    <a href="javascript:closeMenuSetDialog()" class="easyui-linkbutton" iconCls="closed">关闭</a>
+</div>
+
+</body>
+</html>

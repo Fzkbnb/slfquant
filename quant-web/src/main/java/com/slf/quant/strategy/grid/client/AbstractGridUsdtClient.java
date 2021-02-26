@@ -23,6 +23,12 @@ import com.slf.quant.strategy.consts.TradeConst;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 网格策略客户端
+ *
+ * 1。止损功能：由stopLossPrice参数决定，参数为空表示不启用止损功能
+ *  2.止盈功能，由盈利金额决定，当盈利金额大于参数配置值，则全平并退出策略
+ */
 @Data
 @Slf4j
 public abstract class AbstractGridUsdtClient
@@ -61,6 +67,10 @@ public abstract class AbstractGridUsdtClient
     
     protected boolean                    stopFlag                   = false;
     
+    protected boolean                    stopLossFlag               = false;
+    
+    protected boolean                    stopProfitFlag             = false;
+    
     protected BigDecimal                 spotFeeRate_taker;
     
     protected BigDecimal                 spotFeeRate_cal;
@@ -72,6 +82,8 @@ public abstract class AbstractGridUsdtClient
     protected String                     spotFeeRate_maker_str;
     
     protected long                       firstStopTime              = 0;
+    
+    protected long                       firstStopLossTime          = 0;
     
     protected long                       lastCacheTime              = 0;
     
@@ -125,6 +137,20 @@ public abstract class AbstractGridUsdtClient
                 try
                 {
                     cacheSumInfo();
+                    // 先判断是否触发止盈止损条件，是则全平并退出策略
+                    if (stopLossFlag || stopProfitFlag)
+                    {
+                        log.info("策略{},触发止盈止损机制{}|{}，将尝试全平并退出策略！", config.getId(), stopProfitFlag, stopLossFlag);
+                        // 如果触发了止损，则调用市价全平接口
+                        if (closeAllPosition())
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
                     if (checkNeedStop())
                     {
                         break;
@@ -179,6 +205,22 @@ public abstract class AbstractGridUsdtClient
             BigDecimal disCount = BigDecimal.ONE.subtract(BigDecimal.valueOf(2).multiply(config.getFeeRate()));
             if (isFirstBuy())
             {
+                // if (null != config.getStopLossPrice() && currentDepthModel.getAsk().compareTo(config.getStopLossPrice()) == -1)
+                // {
+                // if (firstStopLossTime == 0)
+                // {
+                // firstStopLossTime = curtime;
+                // }
+                // else if (curtime - firstStopLossTime > 5 * 60000)
+                // {
+                // log.info("策略{},触发做多止损持续时间超过5分钟，触发止损策略！");
+                // stopLossFlag = true;
+                // }
+                // }
+                // else
+                // {
+                // firstStopLossTime = 0;
+                // }
                 BigDecimal profitReal1 = realModel.getSumSellBal().subtract(realModel.getSumBuyBal());
                 BigDecimal profitReal2 = unrealModel.getSumSellBal()
                         .subtract(unrealModel.getAvgBuyPrice().multiply(contractPerValue).multiply(unrealModel.getSumSellCont()));
@@ -191,6 +233,22 @@ public abstract class AbstractGridUsdtClient
             }
             else
             {
+                // if (null != config.getStopLossPrice() && currentDepthModel.getAsk().compareTo(config.getStopLossPrice()) == 1)
+                // {
+                // if (firstStopLossTime == 0)
+                // {
+                // firstStopLossTime = curtime;
+                // }
+                // else if (curtime - firstStopLossTime > 5 * 60000)
+                // {
+                // log.info("策略{},触发做空止损持续时间超过5分钟，触发止损策略！");
+                // stopLossFlag = true;
+                // }
+                // }
+                // else
+                // {
+                // firstStopLossTime = 0;
+                // }
                 // 盈利币量计算
                 BigDecimal profitReal1 = realModel.getSumSellBal().subtract(realModel.getSumBuyBal());
                 BigDecimal profitReal2 = unrealModel.getSumBuyCont().multiply(contractPerValue).multiply(unrealModel.getAvgSellPrice())
@@ -202,6 +260,26 @@ public abstract class AbstractGridUsdtClient
                 BigDecimal profitUnreal = leaveSellBal.subtract(currentDepthModel.getAsk().multiply(futureBuyCont).multiply(contractPerValue)).multiply(disCount)
                         .setScale(4, BigDecimal.ROUND_HALF_UP);
                 model.setProfitUnreal(profitUnreal);
+            }
+            // todo 增加一个止盈逻辑：如果盈利合计大于指定金额，则触发止盈，全平并退出策略
+            // 20210107:增加一个二级止盈机制：当持仓保证金超过一半(为了省事这里采用手动参数来控制)且盈利大于0时，立即止盈
+            BigDecimal profitOrLoss = model.getProfitReal().add(model.getProfitUnreal()).setScale(2, BigDecimal.ROUND_HALF_UP);
+            if (null != config.getStopProfitValue() && (profitOrLoss.compareTo(config.getStopProfitValue()) == 1
+                    || (profitOrLoss.compareTo(BigDecimal.ZERO) == 1 && orders.size() >= config.getLimitSize())))
+            {
+                stopProfitFlag = true;
+            }
+            else
+            {
+                stopProfitFlag = false;
+            }
+            if (null != config.getStopLossValue() && profitOrLoss.compareTo(config.getStopLossValue().multiply(BigDecimal.valueOf(-1))) == -1)
+            {
+                stopLossFlag = true;
+            }
+            else
+            {
+                stopLossFlag = false;
             }
             log.info(">>>当前实时统计信息({})<<<", config.getFirstDirect());
             log.info("总卖出/买入金额：{}/{}", realModel.getSumSellBal().add(unrealModel.getSumSellBal()).setScale(2, BigDecimal.ROUND_HALF_UP),
@@ -237,7 +315,7 @@ public abstract class AbstractGridUsdtClient
                 quantStrategyProfit.setAccountId(config.getAccountId());
                 quantStrategyProfit.setStrategyType(KeyConst.STRATEGYTYPE_GRID);
                 quantStrategyProfit.setDisplayTime(displayTime);
-                quantStrategyProfit.setProfit(model.getProfit().add(model.getProfitUnreal()).setScale(2, BigDecimal.ROUND_DOWN));
+                quantStrategyProfit.setProfit(model.getProfitReal().add(model.getProfitUnreal()).setScale(2, BigDecimal.ROUND_DOWN));
                 quantStrategyProfitService.insert(quantStrategyProfit);
                 lastSaveProfitTime = displayTime;
             }
@@ -400,7 +478,7 @@ public abstract class AbstractGridUsdtClient
                 }
                 if (System.currentTimeMillis() - firstStopTime > 65000)
                 {
-                    log.info("策略{},当前处于交易期间，用户发起退出策略请求超过30秒，将退出策略！", idStr);
+                    log.info("策略{},当前处于交易期间，用户发起退出策略请求超过1分钟，将退出策略！", idStr);
                     return true;
                 }
                 log.info("策略{},当前处于交易期间，暂时不能停止用户发起的退出策略！", idStr);
@@ -408,6 +486,24 @@ public abstract class AbstractGridUsdtClient
         }
         return false;
     }
+    
+    /**
+     * 市价全平下单成功后直接退出策略，不再判断订单状态
+     * */
+    protected boolean closeAllPosition()
+    {
+        try
+        {
+            closePositionByMarket(config.getCurrency(), config.getFirstDirect());
+        }
+        catch (Exception e)
+        {
+            log.info("强平接口报错，可能是仓位为0导致，将认为强平成功！");
+        }
+        return true;
+    }
+    
+    protected abstract long closePositionByMarket(String currency, String firstDirect);
     
     protected abstract boolean cancelAllOrder();
     
@@ -732,6 +828,10 @@ public abstract class AbstractGridUsdtClient
                     lastSaveProfitTime = lastProfit.getDisplayTime();
                 }
             }
+            if (null == config.getLimitSize())
+            {
+                config.setLimitSize(10);
+            }
         }
         catch (Exception e)
         {
@@ -748,7 +848,7 @@ public abstract class AbstractGridUsdtClient
     
     public void stop()
     {
-        log.info(">>>策略{},关闭程序<<<", config.getId());
+        log.info(">>>网格策略{},关闭程序<<<", config.getId());
         quantGridConfigService.changeStatus(config.getId(), 0);
         stopFlag = true;
         isStoped = true;

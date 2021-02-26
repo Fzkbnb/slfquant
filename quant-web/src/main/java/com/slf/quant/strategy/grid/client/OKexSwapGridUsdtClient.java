@@ -40,13 +40,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OKexSwapGridUsdtClient extends AbstractGridUsdtClient
 {
-    private SwapMarketAPIService marketAPIService;
+    private SwapMarketAPIService  marketAPIService;
     
-    private AccountAPIService accountAPIService;
+    private AccountAPIService     accountAPIService;
     
-    private SwapTradeAPIService tradeAPIService;
+    private SwapTradeAPIService   tradeAPIService;
     
-    private SwapUserAPIServive swapUserAPIServive;
+    private SwapUserAPIServive    swapUserAPIServive;
     
     private MarginOrderAPIService marginOrderAPIService;
     
@@ -82,7 +82,7 @@ public class OKexSwapGridUsdtClient extends AbstractGridUsdtClient
         }
         return model;
     }
-
+    
     @Override
     protected void cancelContractOrder(String symbol, long orderId)
     {
@@ -119,6 +119,14 @@ public class OKexSwapGridUsdtClient extends AbstractGridUsdtClient
             return null;
         }
         return depth;
+    }
+    
+    @Override
+    protected long closePositionByMarket(String currency, String firstDirect)
+    {
+        JSONObject json = tradeAPIService.closePosition(config.getContractCode(), config.getFirstDirect());
+        BigDecimal code = json.getBigDecimal("error_code");
+        return code.compareTo(BigDecimal.ZERO) == 0 ? 1 : 0;
     }
     
     @Override
