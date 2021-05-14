@@ -2839,4 +2839,12 @@ CREATE TABLE `quant_swapavg_config`
 ) ROW_FORMAT = COMPACT COMMENT ='永续合约动态平衡配置表';
 
 
-
+DROP TABLE IF EXISTS `quant_exchange_currency`;
+CREATE TABLE `quant_exchange_currency`
+(
+  `id`                 bigint COMMENT 'ID',
+  `currency`           varchar(255)   NOT NULL COMMENT '交易币种',
+  `type`                varchar(32)   NOT NULL COMMENT '币种类型',
+  `status`             int            not null COMMENT '运行状态',
+  PRIMARY KEY (`id`)
+  ) ROW_FORMAT = COMPACT COMMENT ='币种配置表';

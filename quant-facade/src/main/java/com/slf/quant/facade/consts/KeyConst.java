@@ -3,9 +3,9 @@ package com.slf.quant.facade.consts;
 public class KeyConst
 {
     public static final String REDISKEY_DIVISOR           = "quant:divisor:";
-
-    public static final String REDISKEY_STRATEGY_STATS       = "quant:strategy:stats:";
-
+    
+    public static final String REDISKEY_STRATEGY_STATS    = "quant:strategy:stats:";
+    
     public static String       quote_currencys            = "BTC,ETH,EOS,LTC,BCH,XRP,BSV,ETC,TRX";
     
     public static final String EXCHANGE_OKEX              = "okex";
@@ -23,4 +23,8 @@ public class KeyConst
     public static final String STRATEGYTYPE_HEDGEINVERSE  = "HedgeInverse";
     
     public static final String STRATEGYTYPE_GRID          = "grid";
+    
+    public static final String SELL                       = "sell";
+    
+    public static final String BUY                        = "buy";
 }
