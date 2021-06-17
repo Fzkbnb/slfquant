@@ -36,7 +36,7 @@ public class WebSocketClient implements WebSocket {
     private final static HashFunction crc32 = Hashing.crc32();
     private Channel ch;
     private WebSocketListener listener;
-    private String URL = "wss://okexcomreal.bafang.com:8443/ws/v3";
+    private String URL = "wss://real.okex.com:8443/ws/v3";
     private Timer timer = new HashedWheelTimer(Executors.defaultThreadFactory());
 
     public WebSocketClient(WebSocketListener listener) {

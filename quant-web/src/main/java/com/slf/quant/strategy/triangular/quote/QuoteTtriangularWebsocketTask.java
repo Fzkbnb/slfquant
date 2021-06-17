@@ -95,7 +95,7 @@ public class QuoteTtriangularWebsocketTask
     private void initOkexClient()
     {
         log.info("okex行情客户端启动次数:{}", okexRestartCount.incrementAndGet());
-        okexListener.setUrl("wss://okexcomreal.bafang.com:8443/ws/v3");
+        okexListener.setUrl("wss://real.okex.com:8443/ws/v3");
         okexClient = new PublicWebSocketClient(okexListener);
         okexClient.connect();
     }

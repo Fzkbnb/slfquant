@@ -87,7 +87,7 @@ public class QuoteAnalysisTask
                         }
                         else
                         {
-                            log.info("{}行情缓存不存在或超时，本次取消当前币种溢价率统计！", currency);
+//                            log.info("{}行情缓存不存在或超时，本次取消当前币种溢价率统计！", currency);
                         }
                     }
                     for (String currency : currencys)
@@ -104,7 +104,7 @@ public class QuoteAnalysisTask
                         }
                         else
                         {
-                            log.info("{}行情缓存不存在或超时，本次取消当前币种溢价率统计！", currency);
+//                            log.info("{}行情缓存不存在或超时，本次取消当前币种溢价率统计！", currency);
                         }
                     }
                     // 对溢价率进行排序

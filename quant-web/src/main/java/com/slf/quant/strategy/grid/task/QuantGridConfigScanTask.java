@@ -11,6 +11,8 @@ import com.slf.quant.facade.entity.strategy.QuantGridConfig;
 import com.slf.quant.facade.service.strategy.QuantApiConfigService;
 import com.slf.quant.facade.service.strategy.QuantGridConfigService;
 import com.slf.quant.facade.utils.EncryptUtils2;
+import com.slf.quant.strategy.grid.client.OKexV5SwapGridUsdtClient;
+import com.slf.quant.util.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,14 +30,13 @@ import lombok.extern.slf4j.Slf4j;
 public class QuantGridConfigScanTask
 {
     @Autowired
-    private QuantGridConfigService quantGridConfigService;
-
+    private QuantGridConfigService   quantGridConfigService;
+    
     @Autowired
-    private QuantApiConfigService quantApiConfigService;
+    private QuantApiConfigService    quantApiConfigService;
     
-//    @Autowired
-//    private RedisUtils               redisUtils;
-    
+    // @Autowired
+    // private RedisUtils redisUtils;
     private ScheduledExecutorService executorService;
     
     public void start()
@@ -46,7 +47,7 @@ public class QuantGridConfigScanTask
         executorService.scheduleWithFixedDelay(() -> {
             try
             {
-//                log.info(">>>开始最新网格配置扫描任务<<<");
+                // log.info(">>>开始最新网格配置扫描任务<<<");
                 List<QuantGridConfig> runList = quantGridConfigService.selectAll();
                 runList.forEach(entity -> {
                     try
@@ -67,16 +68,16 @@ public class QuantGridConfigScanTask
                             }
                             String apiKey = apiConfig.getApiKey();
                             // 私钥需要经过2次解密：
-//                            String redisKey = new StringBuilder(KeyConst.REDISKEY_DIVISOR).append(entity.getId()).toString();
-//                            String divisor = (String) redisUtils.get(redisKey);
-//                            if (StringUtils.isEmpty(divisor))
-//                            {
-//                                log.info("加密因子缓存不存在，策略启动失败：{}", entity.getId());
-//                                // 将状态改为2
-//                                quantGridConfigService.changeStatus(entity.getId(), 2);
-//                                return;
-//                            }
-//                            divisor = EncryptUtils.desDecrypt(divisor);
+                            // String redisKey = new StringBuilder(KeyConst.REDISKEY_DIVISOR).append(entity.getId()).toString();
+                            // String divisor = (String) redisUtils.get(redisKey);
+                            // if (StringUtils.isEmpty(divisor))
+                            // {
+                            // log.info("加密因子缓存不存在，策略启动失败：{}", entity.getId());
+                            // // 将状态改为2
+                            // quantGridConfigService.changeStatus(entity.getId(), 2);
+                            // return;
+                            // }
+                            // divisor = EncryptUtils.desDecrypt(divisor);
                             String secretKey = EncryptUtils2.desDecrypt(apiConfig.getSecretKey());
                             AbstractGridUsdtClient client = null;
                             if (KeyConst.EXCHANGE_HUOBI.equalsIgnoreCase(entity.getExchange()))
@@ -92,7 +93,14 @@ public class QuantGridConfigScanTask
                                 if (entity.getContractCode().contains("SWAP"))
                                 {
                                     // okex永续合约
-                                    client = new OKexSwapGridUsdtClient(config, apiKey, secretKey, passPhrase);
+                                    if (StringUtil.isNotEmpty(apiConfig.getRemark()) && apiConfig.getRemark().contains("v5"))
+                                    {
+                                        client = new OKexV5SwapGridUsdtClient(config, apiKey, secretKey, passPhrase);
+                                    }
+                                    else
+                                    {
+                                        client = new OKexSwapGridUsdtClient(config, apiKey, secretKey, passPhrase);
+                                    }
                                 }
                                 else
                                 {

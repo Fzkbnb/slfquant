@@ -24,6 +24,8 @@ public class QuoteDepth implements Comparable
     
     private String             instrument_id;
     
+    private String             instId;
+    
     // 买单列表
     private List<List<String>> bids;
     
@@ -56,7 +58,7 @@ public class QuoteDepth implements Comparable
         if (CollectionUtils.isNotEmpty(bids))
         {
             bid = new BigDecimal(bids.get(0).get(0));
-            bidAmt =new BigDecimal(bids.get(0).get(1));
+            bidAmt = new BigDecimal(bids.get(0).get(1));
         }
         if (CollectionUtils.isNotEmpty(asks))
         {

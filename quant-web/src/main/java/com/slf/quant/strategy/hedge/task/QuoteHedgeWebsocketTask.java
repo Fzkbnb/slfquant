@@ -4,9 +4,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.slf.quant.facade.consts.UrlConst;
 import com.slf.quant.facade.utils.QuantUtil;
+import com.slf.quant.strategy.config.QuantUrlConfig;
+import com.slf.quant.strategy.config.StrategyConfig;
 import com.slf.quant.strategy.grid.quote.PublicWebSocketClient;
 import com.slf.quant.strategy.hedge.quote.HuobiFutureMarketListener;
 import com.slf.quant.strategy.hedge.quote.OkexHedgeUsdtMarketListener;
+import com.slf.quant.strategy.hedge.quote.OkexHedgeUsdtMarketListenerV5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -24,7 +27,11 @@ public class QuoteHedgeWebsocketTask
     
     @Autowired
     OkexHedgeUsdtMarketListener okexListener;
-    
+    // okex
+    PublicWebSocketClient    okexClientV5;
+
+    @Autowired
+    OkexHedgeUsdtMarketListenerV5 okexListenerV5;
     @Autowired
     @Qualifier("huobiFutureMarketListener")
     HuobiFutureMarketListener huobiFutureListener;
@@ -55,10 +62,22 @@ public class QuoteHedgeWebsocketTask
                     if (QuantUtil.isInSettlement())
                     {
                         // 交割期间为防止错乱将关闭websocket客户端，并将16:32之后重启
-                        if (null != okexClient)
+                        // 交割期间为防止错乱将关闭websocket客户端，并将16:32之后重启
+                        if (StrategyConfig.enableOkexV5)
                         {
-                            okexClient.closeConnection();
-                            okexClient = null;
+                            if (null != okexClientV5)
+                            {
+                                okexClientV5.closeConnection();
+                                okexClientV5 = null;
+                            }
+                        }
+                        else
+                        {
+                            if (null != okexClient)
+                            {
+                                okexClient.closeConnection();
+                                okexClient = null;
+                            }
                         }
                         // if (null != huobiSpotClient)
                         // {
@@ -73,7 +92,14 @@ public class QuoteHedgeWebsocketTask
                     }
                     else
                     {
-                        monitorOkex();
+                        if (StrategyConfig.enableOkexV5)
+                        {
+                            monitorOkexV5();
+                        }
+                        else
+                        {
+                            monitorOkex();
+                        }
                         // monitorHuobiSpot();
 //                        monitorHuobiFuture();
                         // if (!isFirstStart)
@@ -156,7 +182,7 @@ public class QuoteHedgeWebsocketTask
     private void initOkexClient()
     {
         log.info("okex行情客户端启动次数:{}", okexRestartCount.incrementAndGet());
-        okexListener.setUrl("wss://okexcomreal.bafang.com:8443/ws/v3");
+        okexListener.setUrl("wss://real.okex.com:8443/ws/v3");
         okexClient = new PublicWebSocketClient(okexListener);
         okexClient.connect();
     }
@@ -191,5 +217,37 @@ public class QuoteHedgeWebsocketTask
         huobiFutureListener.setUrl(UrlConst.huobi_endpoint_websocket_future);
         huobiFutureClient = new PublicWebSocketClient(huobiFutureListener);
         huobiFutureClient.connect();
+    }
+
+    private void monitorOkexV5()
+    {
+        try
+        {
+            if (null == okexClientV5)
+            {
+                // 首次启动
+                log.info("即将启动okexV5行情websocket客户端！");
+                initOkexClientV5();
+            }
+            else if (!okexClientV5.getMarketListener().isConnected())
+            {
+                // 如果连接已经断开或者消息接收超时，要重新建立连接
+                log.info("okexV5行情websocket客户端已断开，即将重启客户端！");
+                okexClientV5.closeConnection();
+                initOkexClientV5();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void initOkexClientV5()
+    {
+        log.info("okexV5行情客户端启动次数:{}", okexRestartCount.incrementAndGet());
+        okexListenerV5.setUrl(QuantUrlConfig.okex_endpoint_websocket_v5);
+        okexClientV5 = new PublicWebSocketClient(okexListenerV5);
+        okexClientV5.connect();
     }
 }

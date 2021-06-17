@@ -60,10 +60,10 @@ public class Initer implements ApplicationRunner
         log.info(">>>开始启动调平策略配置扫描任务<<<");
         quantAvgConfigScanTask.start();
         // todo 待改造，目前只支持行情监控
-        log.info(">>>开始启动套利任务<<<");
-        AbstractTriangularClient client = new AbstractTriangularClient(null, null, null, null);
-        quoteTtriangularWebsocketTask.start();
-        client.start();
+//        log.info(">>>开始启动套利任务<<<");
+//        AbstractTriangularClient client = new AbstractTriangularClient(null, null, null, null);
+//        quoteTtriangularWebsocketTask.start();
+//        client.start();
         // 根据命令行参数确定要启动的策略类型
         // String type = KeyConst.STRATEGYTYPE_GRID;
         // String type = args.getOptionValues("type").get(0);

@@ -13,6 +13,7 @@ import com.slf.quant.facade.consts.UrlConst;
 import com.slf.quant.facade.model.*;
 import com.slf.quant.facade.sdk.okex.v5.bean.account.param.SetLeverage;
 import com.slf.quant.facade.sdk.okex.v5.bean.trade.param.CancelOrder;
+import com.slf.quant.facade.sdk.okex.v5.bean.trade.param.ClosePositions;
 import com.slf.quant.facade.sdk.okex.v5.bean.trade.param.PlaceOrder;
 import com.slf.quant.facade.sdk.okex.v5.config.APIConfiguration;
 import com.slf.quant.facade.sdk.okex.v5.service.account.AccountAPIService;
@@ -114,13 +115,14 @@ public class OkexV5CommonApiClient
             {
                 JSONObject json = array.getJSONObject(i);
                 QuantCommonSymbolInfo symbolInfo = new QuantCommonSymbolInfo();
-                String currency = json.getString("settleCcy");
-                symbolInfo.setBaseCurrency(json.getString(currency));
-                symbolInfo.setQuoteCurrency("USDT");
+                String code = json.getString("instId");
+                symbolInfo.setBaseCurrency(code.substring(0, code.indexOf("-")));
+                symbolInfo.setQuoteCurrency(code.contains("-USD-") ? "USD" : "USDT");
                 symbolInfo.setSymbol(json.getString("instId"));
                 symbolInfo.setContractPriceTick(json.getBigDecimal("tickSz"));
                 symbolInfo.setContractPricePrecision(QuantUtil.getPrecision(json.getBigDecimal("tickSz")));
                 symbolInfo.setContractVal(json.getBigDecimal("ctVal"));
+                list.add(symbolInfo);
             }
             if (StringUtils.isNotEmpty(symbol))
             {
@@ -238,6 +240,8 @@ public class OkexV5CommonApiClient
                 order.setEntrustPrice(res.getBigDecimal("px"));
                 order.setAvgPrice(res.getBigDecimal("avgPx"));
                 order.setPnl(res.getBigDecimal("pnl"));
+                order.setEntrustSide(res.getString("side"));
+                order.setPosSide(res.getString("posSide"));
                 // 如果有成交则计算手续费率：手续费*-1*成交均价/成交张数*面值
                 order.setCreateTime(res.getLongValue("cTime"));
                 /**
@@ -348,7 +352,7 @@ public class OkexV5CommonApiClient
         PlaceOrder placeOrder = new PlaceOrder();
         if (StringUtils.isEmpty(tdMode))
         {
-            tdMode = "isolated";
+            tdMode = "cross";//默认全仓
         }
         placeOrder.setTdMode(tdMode);
         placeOrder.setInstId(contractCode);
@@ -809,5 +813,16 @@ public class OkexV5CommonApiClient
             log.info("okex v5永续合约资金费率获取失败：{}|{}", contractCode, e.getLocalizedMessage());
             return null;
         }
+    }
+    
+    public long closeAllPositionByMaket(String instId, String posDirect, String marginMode, String marginCurrency)
+    {
+        ClosePositions param = new ClosePositions();
+        param.setInstId(instId);
+        param.setPosSide(posDirect);
+        param.setMgnMode(marginMode);
+        param.setCcy(marginCurrency);
+        JSONObject json = tradeAPIService.closePositions(param);
+        return "0".equalsIgnoreCase(json.getString("code")) ? 1 : 0;
     }
 }

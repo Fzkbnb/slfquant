@@ -30,3 +30,10 @@ spring:
     max-active: 20
       # 获取连接超时时间
     max-wait: 5000
+com:
+  slfquant:
+    strategy:
+      # 运行环境：test内测环境，product生产环境
+      env: product
+      # 是否启用okex-v5
+      enable-okex-v5: true
