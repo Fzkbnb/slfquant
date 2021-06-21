@@ -490,5 +490,5 @@ public abstract class AbstractHedgeUsdtClient
      * @param orderType 订单类型：1开多；2开空；3平多；4平空
      * @return
      */
-    protected abstract long createFutureOrder(String symbol, BigDecimal price, BigDecimal cont, int orderType, boolean enableMaker);
+    protected abstract long createFutureOrder(String symbol, BigDecimal price, BigDecimal cont, Integer orderType, boolean enableMaker);
 }

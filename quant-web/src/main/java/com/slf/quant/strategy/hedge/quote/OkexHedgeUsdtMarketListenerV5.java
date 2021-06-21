@@ -58,6 +58,8 @@ public class OkexHedgeUsdtMarketListenerV5 extends AbstractMarketListener
             channels.add(topic_cq);
             String topic_nq = DEPTHCHANNEL.replace("symbol", currency + "-USDT-" + nq);
             channels.add(topic_nq);
+            String topic_swap = DEPTHCHANNEL.replace("symbol", currency + "-USDT-SWAP");
+            channels.add(topic_swap);
         });
         String channelsStr = channels.stream().map(String::valueOf).collect(Collectors.joining(","));
         String msg = DEPTH.replace("channels", channelsStr);

@@ -252,7 +252,7 @@ public class OKexHedgeUsdtClient extends AbstractHedgeUsdtClient
     }
     
     @Override
-    protected long createFutureOrder(String symbol, BigDecimal price, BigDecimal cont, int orderType, boolean maker)
+    protected long createFutureOrder(String symbol, BigDecimal price, BigDecimal cont, Integer orderType, boolean maker)
     {
         try
         {

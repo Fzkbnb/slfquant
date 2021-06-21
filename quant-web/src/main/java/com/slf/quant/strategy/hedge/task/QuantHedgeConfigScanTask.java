@@ -5,8 +5,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.slf.quant.strategy.grid.client.OKexSwapGridUsdtClient;
+import com.slf.quant.strategy.grid.client.OKexV5SwapGridUsdtClient;
 import com.slf.quant.strategy.hedge.client.usdt.AbstractHedgeUsdtClient;
 import com.slf.quant.strategy.hedge.client.usdt.OKexHedgeUsdtClient;
+import com.slf.quant.strategy.hedge.client.usdt.OKexV5HedgeUsdtClient;
+import com.slf.quant.util.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -86,8 +90,15 @@ public class QuantHedgeConfigScanTask
                                 String passPhrase = EncryptUtils2.desDecrypt(apiConfig.getPassPhrase());
                                 QuantHedgeConfig config = new QuantHedgeConfig();
                                 BeanUtils.copyProperties(entity, config);
-                                // okex交割合约
-                                client = new OKexHedgeUsdtClient(config, apiKey, secretKey, passPhrase);
+                                // okex合约
+                                if (StringUtil.isNotEmpty(apiConfig.getRemark()) && apiConfig.getRemark().contains("v5"))
+                                {
+                                    client = new OKexV5HedgeUsdtClient(config, apiKey, secretKey, passPhrase);
+                                }
+                                else
+                                {
+                                    client = new OKexHedgeUsdtClient(config, apiKey, secretKey, passPhrase);
+                                }
                             }
                             if (null != client)
                             {
